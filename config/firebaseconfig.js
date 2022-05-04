@@ -2,6 +2,7 @@
 import * as firebase from 'firebase';
 
 
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -22,8 +23,11 @@ const firebaseConfig = {
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
-
-export { firebase };
+export {
+  firebase,
+  
+  
+};
 // export const auth = initializeAuth(app, {
 //   persistence: getReactNativePersistence(AsyncStorage),
 // });

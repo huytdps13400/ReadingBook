@@ -1,14 +1,18 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View,LogBox } from 'react-native';
+import RootStack from "./app/navigation/rootStack";
 
-export default function App() {
+LogBox.ignoreAllLogs();
+console.ignoredYellowBox = ["Setting a timer"];
+const App = () => {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <>
+      <StatusBar style="dark" />
+      <RootStack />
+    </>
   );
-}
+};
+export default App;
 
 const styles = StyleSheet.create({
   container: {
