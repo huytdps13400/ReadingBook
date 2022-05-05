@@ -56,7 +56,7 @@ import {
             title: "",
   
             tabBarIcon: ({ color }) => (
-              <Icon name="wallet" size={24} color={color} />
+              <Icon name="search" size={24} color={color} />
             ),
           }}
         />
@@ -76,7 +76,7 @@ import {
             title: "",
   
             tabBarIcon: ({ color }) => (
-              <Icon name="stats-chart" size={24} color={color} />
+              <Icon name="heart" size={24} color={color} />
             ),
           }}
         />
@@ -87,7 +87,7 @@ import {
             title: "",
   
             tabBarIcon: ({ color }) => (
-              <Icon name="grid" size={24} color={color} />
+              <Icon name="person-circle" size={24} color={color} />
             ),
           }}
         />
