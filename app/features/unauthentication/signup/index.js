@@ -76,7 +76,7 @@ const SignUpScreen = () => {
         <View style={styles.boxLogo}>
           <Image
             source={{
-              uri: "https://suno.vn/blog/wp-content/uploads/2014/12/nike-lich-su-thiet-ke-logo.jpg",
+              uri: "http://unblast.com/wp-content/uploads/2020/04/Man-Reading-a-Book-Vector-Illustration-1.jpg",
             }}
             style={styles.logo}
             resizeMode="contain"
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: 140,
-    height: 70,
+    height: 140,
     marginTop: 100,
   },
   boxLogo: {
