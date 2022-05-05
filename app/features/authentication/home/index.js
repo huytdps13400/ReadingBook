@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet,Dimensions ,FlatList,ImageBackground,Image,ScrollView,TouchableOpacity} from "react-native";
+import { View, Text, StyleSheet,Dimensions,Linking ,FlatList,ImageBackground,Image,ScrollView,TouchableOpacity} from "react-native";
 import React,{useEffect,useState} from "react";
 import { theme } from "../../../theme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -6,7 +6,32 @@ import Carousel from 'react-native-snap-carousel';
 import { firebase } from "../../../../config/firebaseconfig";
 import { useNavigation,useIsFocused } from "@react-navigation/native";
 import { routesName } from "../../../navigation/routes";
-
+import TextInputForm from "../../../components/TextInputForm";
+export const API_BOOKS_KEY = 'AIzaSyB-OtACxBjF7rAudHEmIH_vT_CAu2d6p5U';
+export const GOOGLE_BOOKS_URL = 'https://www.googleapis.com/books';
+export const KEY_HEADER = '&key=' + API_BOOKS_KEY;
+export const ALL_EBOOKS_ENDPOInT = '/v1/volumes?q=';
+export const FREE_BOOKS_ENPOINT = '/v1/volumes?q=flowers&filter=free-ebooks';
+export async function getData(url, endpoint) {
+  try {
+    const fullURL = url + endpoint;
+    console.log(fullURL);
+    const response = await fetch(fullURL);
+    const responseJson = await response.json();
+    return responseJson;
+  } catch (error) {
+    return error.toString();
+  }
+}
+export const getAllEbooks = async bookName => {
+  const endpoint =
+   ALL_EBOOKS_ENDPOInT + bookName+'&maxResults=40' + KEY_HEADER;
+  return await getData(GOOGLE_BOOKS_URL, endpoint);
+};
+export const getFreeEBooks = async () => {
+  const endpoint = FREE_BOOKS_ENPOINT + KEY_HEADER;
+  return await getData(GOOGLE_BOOKS_URL, endpoint);
+};
 const dataCategory = [
   { label: "Chính trị – pháp luật", value: 7 },
   { label: "Khoa học công nghệ – Kinh tế", value: 1 },
@@ -28,25 +53,35 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const [DataBook, setDataBook] = useState([]);
+  const [keyword, setKeyword] = useState('');
 
-  useEffect(async () => {
-    const userRef = firebase.default.database().ref('/Book');
+  // useEffect(async () => {
+  //   const userRef = firebase.default.database().ref('/Book');
 
-    const OnLoadingListener = userRef.on('value', (snapshot) => {
-      setDataBook([]);
-      snapshot.forEach(function (childSnapshot) {
-        if(firebase.default.auth()?.currentUser?.uid === childSnapshot.val()?.uid){
-          setDataBook((users) => [...users, childSnapshot.val()]);
-          console.log('alal',childSnapshot.val())
-        }
+  //   const OnLoadingListener = userRef.on('value', (snapshot) => {
+  //     setDataBook([]);
+  //     snapshot.forEach(function (childSnapshot) {
+  //       if(firebase.default.auth()?.currentUser?.uid === childSnapshot.val()?.uid){
+  //         setDataBook((users) => [...users, childSnapshot.val()]);
+  //         console.log('alal',childSnapshot.val())
+  //       }
         
-      });
-    });
-    return () => {
-      userRef.off('value', OnLoadingListener);
+  //     });
+  //   });
+  //   return () => {
+  //     userRef.off('value', OnLoadingListener);
     
-    };
-  }, [isFocused]);
+  //   };
+  // }, [isFocused]);
+  useEffect(async()=>{
+await getAllEbooks(keyword).then((res)=>{
+setDataBook(res.items);
+console.log({data:res.items})
+});
+
+
+  },[isFocused,keyword])
+  
 const  _renderItem = ({item, index}) => {
   return (
       <ImageBackground imageStyle={{
@@ -59,14 +94,15 @@ const  _renderItem = ({item, index}) => {
         height:200,
         width:width-32
        }}
-       source={{uri:item.imageUrl}}>
-          <Text style={{fontSize: 30,position:'absolute',bottom:50,left:10,color:'white'}}>{item.nameBook}</Text>
-          <Text style={{fontSize: 20,position:'absolute',bottom:20,left:10,color:'white'}}>{item.author}</Text>
+       source={{uri: typeof item?.volumeInfo?.authors !== 'undefined' ?item.volumeInfo?.imageLinks?.thumbnail.replace('zoom=1','zoom=2'):''}}>
+          <Text style={{fontSize: 30,position:'absolute',bottom:50,left:10,color:'black'}}>{item?.volumeInfo?.title}</Text>
+          <Text style={{fontSize: 20,position:'absolute',bottom:20,left:10,color:'black'}}>{item.author}</Text>
 
       </ImageBackground>
   );
 }
 const _renderItemBook =({item,index})=>{
+  console.log('kaka', )
   const category = dataCategory.filter((v)=> v?.value ===item?.category)[0]?.label;
   return(
     <TouchableOpacity style={{width :(width-32),
@@ -83,17 +119,35 @@ const _renderItemBook =({item,index})=>{
     elevation: 5,
     paddingBottom:10,
     marginHorizontal:16
+    }}
+    onPress={()=>{
+      Linking.openURL(item?.volumeInfo?.previewLink)
     }}>
-      <Image style={{width:(width-32) ,height:100,borderTopLeftRadius:8,borderTopRightRadius:8}} source={{uri:item.imageUrl}}/>
+      <Image 
+      resizeMode='contain'
+      style={{width:(width-32) ,height:300,borderTopLeftRadius:8,borderTopRightRadius:8}} source={{uri:item.volumeInfo.imageLinks.thumbnail.replace('zoom=1','zoom=50')}}/>
     <View style={{margin:10}}>
-    <Text style={{fontSize:16,marginBottom:10}}>{item.nameBook}</Text>
-    <Text style={{fontSize:16,marginBottom:10}}>{item.author}</Text>
+    <Text style={{fontSize:16,marginBottom:10}}>{item?.volumeInfo?.title}</Text>
+    {
+      typeof item?.volumeInfo?.authors !== 'undefined' && (
+ item?.volumeInfo?.authors.map((item,index)=>{
+        return(
+          <Text style={{fontSize:16,marginBottom:10}}>{item}</Text>
+
+        )
+      })
+      )
+     
+    }
     <Text style={{fontSize:16}}>{category}</Text>
 
     </View>
     </TouchableOpacity>
   )
 }
+const handleKeyword = React.useCallback((text)=>{
+  setKeyword(text)
+},[])
   return (
     <View style={[styles.container,{paddingTop:inset.top }]}>
 
@@ -105,6 +159,19 @@ const _renderItemBook =({item,index})=>{
         <View style={{paddingHorizontal:16}}>
 
       <Text style={{fontSize:20,fontWeight:'bold'}}>DashBoard</Text>
+      <TextInputForm
+                style={{
+                  marginVertical: 10,
+                  borderRadius: 4,
+                  borderWidth: 1,
+                  paddingHorizontal: 12,
+                  borderColor: theme.colors.lightGray,
+                }}
+                placeholder="Search Keyword...."
+                value={keyword}
+                onChangeText={(text)=> handleKeyword(text)}
+           
+              />
       <View style={{height:30}}/>
       {DataBook ?(
          <Carousel
@@ -130,11 +197,18 @@ const _renderItemBook =({item,index})=>{
             data={DataBook}
             renderItem={_renderItemBook}
             keyExtractor={(item,index)=> item.id.toString()}
-            
+            contentContainerStyle={{flex:1}}
             showsHorizontalScrollIndicator={false}
             ItemSeparatorComponent={()=>{
               return(
                 <View style={{width:10}}/>
+              )
+            }}
+            ListEmptyComponent={()=>{
+              return(
+                <View style={{height:'100%',alignItems:'center',justifyContent:'center'}}>
+                  <Text style={{fontSize:30}}>No Data</Text>
+                </View>
               )
             }}
             />
