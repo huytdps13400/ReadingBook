@@ -51,6 +51,10 @@ const RootStack = () => {
                 name={routesName.EDIT_PROFILE_SCREEN}
                 component={bottom.EditProfileScreen}
               />
+                 <Stack.Screen
+                name={routesName.CHANGE_PASSWORD_SCREEN}
+                component={bottom.ChangePasswordScreen}
+              />
             </>
           ) : (
             <>

@@ -5,6 +5,7 @@ import {
   Image,
   TouchableOpacity,
   Keyboard,
+  Alert
 } from "react-native";
 import React, { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -51,7 +52,19 @@ const LoginScreen = () => {
       })
       .catch((error) => {
         setIsLoadingLogin(false);
+        const { message} = error;
 
+        Alert.alert(
+          "Error",
+          message,
+          [
+            {
+              text: "OK",
+              style:'cancel',
+             
+            },
+          ]
+        );
         console.log(error);
       });
   });

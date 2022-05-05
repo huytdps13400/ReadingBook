@@ -8,7 +8,7 @@ import { useNavigation,useIsFocused } from "@react-navigation/native";
 import Icons from "@expo/vector-icons/Ionicons";
 import { routesName } from "../../../navigation/routes";
 
-const MoreScreen = () => {
+const ProfileScreen = () => {
   const inset = useSafeAreaInsets();
   const [info, setInfo] = useState([]);
 
@@ -20,7 +20,7 @@ const MoreScreen = () => {
     const OnLoadingListener = userRef.on('value', (snapshot) => {
       setInfo([]);
       snapshot.forEach(function (childSnapshot) {
-        if(firebase.default.auth().currentUser.uid === childSnapshot.val()?.uid){
+        if(firebase.default.auth()?.currentUser?.uid === childSnapshot.val()?.uid){
           setInfo((users) => [...users, childSnapshot.val()]);
           console.log('alal',childSnapshot.val())
         }
@@ -41,7 +41,7 @@ const MoreScreen = () => {
           resizeMode="contain"
           source={{
             uri: firebase.default.auth()?.currentUser?.photoURL
-              ?firebase.default.auth()?.currentUser.photoURL
+              ?firebase.default.auth()?.currentUser?.photoURL
               : "https://freesvg.org/img/myAvatar.png",
           }}
         />
@@ -70,19 +70,29 @@ const MoreScreen = () => {
           <Icons name="create-outline" size={24} />
         </TouchableOpacity>
       </View>
+      <View style={{ marginHorizontal:20}}>
       <Button
+        title={"Change Password"}
+        backgroundColor={theme.colors.orange}
+        onPress={() => {
+         navigation.navigate(routesName.CHANGE_PASSWORD_SCREEN)
+        }}
+      />
+        <Button
         title={"LogOut"}
         backgroundColor={theme.colors.orange}
         onPress={() => {
          firebase.default.auth().signOut();
         }}
       />
-      <Text>MoreScreen</Text>
+      </View>
+     
+    
     </View>
   );
 };
 
-export default MoreScreen;
+export default ProfileScreen;
 
 const styles = StyleSheet.create({
   container: {
