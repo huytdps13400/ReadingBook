@@ -9,7 +9,7 @@ import { routesName } from "../../../navigation/routes";
 import TextInputForm from "../../../components/TextInputForm";
 export const API_BOOKS_KEY = 'AIzaSyB-OtACxBjF7rAudHEmIH_vT_CAu2d6p5U';
 export const GOOGLE_BOOKS_URL = 'https://www.googleapis.com/books';
-export const KEY_HEADER = '&key=' + API_BOOKS_KEY;
+export const KEY_HEADER = ' :keyes&key=' + API_BOOKS_KEY;
 export const ALL_EBOOKS_ENDPOInT = '/v1/volumes?q=';
 export const FREE_BOOKS_ENPOINT = '/v1/volumes?q=flowers&filter=free-ebooks';
 export async function getData(url, endpoint) {
@@ -25,7 +25,7 @@ export async function getData(url, endpoint) {
 }
 export const getAllEbooks = async bookName => {
   const endpoint =
-   ALL_EBOOKS_ENDPOInT + bookName+'&maxResults=40' + KEY_HEADER;
+   ALL_EBOOKS_ENDPOInT + bookName+ KEY_HEADER;
   return await getData(GOOGLE_BOOKS_URL, endpoint);
 };
 export const getFreeEBooks = async () => {
@@ -87,14 +87,23 @@ const  _renderItem = ({item, index}) => {
       <ImageBackground imageStyle={{
         borderRadius: 5,
         height:200,
-        width:width-32
+        width:width-32,
+        elevation:8,
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
        
        }}
        style={{
         height:200,
         width:width-32
        }}
-       source={{uri: typeof item?.volumeInfo?.authors !== 'undefined' ?item.volumeInfo?.imageLinks?.thumbnail.replace('zoom=1','zoom=2'):''}}>
+       resizeMode='contain'
+       source={{uri: typeof item?.volumeInfo?.authors !== 'undefined' ?item.volumeInfo?.imageLinks?.smallThumbnail?.replace('zoom=1','zoom=2'):''}}>
           <Text style={{fontSize: 30,position:'absolute',bottom:50,left:10,color:'black'}}>{item?.volumeInfo?.title}</Text>
           <Text style={{fontSize: 20,position:'absolute',bottom:20,left:10,color:'black'}}>{item.author}</Text>
 
@@ -102,11 +111,10 @@ const  _renderItem = ({item, index}) => {
   );
 }
 const _renderItemBook =({item,index})=>{
-  console.log('kaka', )
+  console.log('rating',item.volumeInfo?.ratingsCount)
   const category = dataCategory.filter((v)=> v?.value ===item?.category)[0]?.label;
   return(
     <TouchableOpacity style={{width :(width-32),
-    backgroundColor:'white',
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -117,22 +125,28 @@ const _renderItemBook =({item,index})=>{
     marginVertical:10,
     borderRadius:8,
     elevation: 5,
-    paddingBottom:10,
-    marginHorizontal:16
+    // paddingBottom:10,
+    marginHorizontal:16,
+    backgroundColor:'red',
+    flexDirection: "row",
+  
     }}
     onPress={()=>{
       Linking.openURL(item?.volumeInfo?.previewLink)
     }}>
-      <Image 
+      {item.volumeInfo?.imageLinks?.thumbnail && (
+        <Image 
       resizeMode='contain'
-      style={{width:(width-32) ,height:300,borderTopLeftRadius:8,borderTopRightRadius:8}} source={{uri:item.volumeInfo.imageLinks.thumbnail.replace('zoom=1','zoom=50')}}/>
-    <View style={{margin:10}}>
+      style={{width:(width-32)*0.5 ,height:300}} source={{uri:item.volumeInfo?.imageLinks?.thumbnail.replace('zoom=1','zoom=1')|| null}}/>
+      )}
+      
+    <View style={{width:(width-32)*0.5,paddingLeft:10}}>
     <Text style={{fontSize:16,marginBottom:10}}>{item?.volumeInfo?.title}</Text>
     {
       typeof item?.volumeInfo?.authors !== 'undefined' && (
  item?.volumeInfo?.authors.map((item,index)=>{
         return(
-          <Text style={{fontSize:16,marginBottom:10}}>{item}</Text>
+          <Text style={{fontSize:16,marginBottom:10,}}>{item}</Text>
 
         )
       })
