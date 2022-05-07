@@ -1,28 +1,415 @@
-import { View, Text } from 'react-native'
-import React,{ useEffect, useState } from 'react'
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+  ScrollView,
+  Alert,
+  FlatList,
+} from "react-native";
+import React, { useEffect, useState } from "react";
 import { firebase } from "../../../../config/firebaseconfig";
 import Header from "../../../components/Header";
 import TextInputForm from "../../../components/TextInputForm";
 import Button from "../../../components/Button";
 import { theme } from "../../../theme";
-import { useNavigation,useIsFocused } from "@react-navigation/core";
+import { useNavigation, useIsFocused } from "@react-navigation/core";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Rating } from "react-native-elements";
 
-const BookDetail = () => {
+import {
+  useFonts,
+  Roboto_100Thin,
+  Roboto_100Thin_Italic,
+  Roboto_300Light,
+  Roboto_300Light_Italic,
+  Roboto_400Regular,
+  Roboto_400Regular_Italic,
+  Roboto_500Medium,
+  Roboto_500Medium_Italic,
+  Roboto_700Bold,
+  Roboto_700Bold_Italic,
+  Roboto_900Black,
+  Roboto_900Black_Italic,
+} from "@expo-google-fonts/roboto";
+import {
+  Oswald_200ExtraLight,
+  Oswald_300Light,
+  Oswald_400Regular,
+  Oswald_500Medium,
+  Oswald_600SemiBold,
+  Oswald_700Bold,
+} from "@expo-google-fonts/oswald";
+
+const { width } = Dimensions.get("window");
+
+const BookDetail = ({ route }) => {
   const navigation = useNavigation();
+  const inset = useSafeAreaInsets();
+  const [showSynopsis, setShowSynopsis] = useState(false);
+
   const isFocused = useIsFocused();
+  const { item: bookDetail } = route.params || {};
+  const [infoBook, setInfoBook] = useState({});
+  const [reviewList, setReviewList] = useState([]);
+
+  const bookAll = useSelector((state) => state.books.bookmark);
+  const [review, setReview] = useState("");
+  const [rating, setRating] = useState(0);
+
+  let [fontsLoaded] = useFonts({
+    Roboto_100Thin,
+    Roboto_100Thin_Italic,
+    Roboto_300Light,
+    Roboto_300Light_Italic,
+    Roboto_400Regular,
+    Roboto_400Regular_Italic,
+    Roboto_500Medium,
+    Roboto_500Medium_Italic,
+    // Roboto_700Bold,
+    Roboto_700Bold_Italic,
+    Roboto_900Black,
+    // Roboto_900Black_Italic,
+    Oswald_200ExtraLight,
+    Oswald_300Light,
+    Oswald_400Regular,
+    Oswald_500Medium,
+    Oswald_600SemiBold,
+    Oswald_700Bold,
+  });
+  console.log({ bookAll });
+  useEffect(() => {
+    // console.log(
+    //   "huy",
+    //   bookAll,
+    //   bookAll?.filter((v) => v.id === bookDetail?.id)[0]?.length > 0
+    // );
+    try {
+      const dataBook = bookAll?.filter((v) => v.id === bookDetail?.id)[0];
+      if (bookAll?.filter((v) => v.id === bookDetail?.id)[0]) {
+        setInfoBook(dataBook);
+      } else {
+        firebase.default
+          .database()
+          .ref("Book/" + bookDetail?.id)
+          .update(bookDetail)
+          .then(() => {
+            // Alert.alert(
+            //         "Success",
+            //         "Congratulations on your successful save",
+            //         [
+            //           {
+            //             text: "OK",
+            //             onPress: () =>
+            //               navigation.navigate(routesName.HOME_SCREEN),
+            //           },
+            //         ]
+            //       );
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+        setInfoBook(bookDetail);
+      }
+    } catch (error) {
+      console.log({ error });
+    }
+  }, [bookDetail?.id]);
+  const showFullSynopsis = () => {
+    setShowSynopsis((value) => !value);
+    // console.log('message: ', bookMark)
+  };
+  useEffect(async () => {
+    const userRef = firebase.default.database().ref("/Review");
+
+    const OnLoadingListener = userRef.on("value", (snapshot) => {
+      setReviewList([]);
+      snapshot.forEach(function (childSnapshot) {
+        if (infoBook?.id === childSnapshot.val()?.idBook) {
+          setReviewList((users) => [...users, childSnapshot.val()]);
+        }
+      });
+    });
+    return () => {
+      userRef.off("value", OnLoadingListener);
+    };
+  }, [isFocused, infoBook?.id]);
   return (
-    <View style={[styles.container, { paddingTop: inset.top }]} >
-              <Header title="Edit Profile" />
+    <View style={[styles.container, { paddingTop: inset.top }]}>
+      <Header title="Book Details" />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View
+          style={{
+            alignItems: "center",
+            paddingTop: 20,
+            paddingHorizontal: 16,
+          }}
+        >
+          {fontsLoaded && (
+            <View
+              style={{
+                borderColor: "teal",
+                borderWidth: 1,
+                borderRadius: 10,
+                padding: 20,
+                width: width - 32,
+              }}
+            >
+              <View style={styles.imageContainer}>
+                <Image
+                  style={styles.tinyLogo}
+                  source={{
+                    uri: infoBook?.volumeInfo?.imageLinks?.smallThumbnail,
+                  }}
+                />
+              </View>
+              <View style={styles.titleInfo}>
+                <Text style={styles.title}>{infoBook?.volumeInfo?.title}</Text>
+                <Text style={styles.author}>
+                  by {infoBook?.volumeInfo?.authors}
+                </Text>
+                {infoBook?.volumeInfo?.categories ? (
+                  <Text style={{ marginVertical: 10 }}>
+                    {infoBook?.volumeInfo?.categories
+                      ? infoBook?.volumeInfo?.categories[0]
+                      : ""}
+                  </Text>
+                ) : null}
+                <View style={styles.rating}>
+                  <Rating
+                    type="star"
+                    startingValue={infoBook?.volumeInfo?.averageRating || 0}
+                    readonly
+                    imageSize={30}
+                    style={{ paddingVertical: 10 }}
+                  />
+                  <Text style={styles.ratingNumber}>
+                    {infoBook?.volumeInfo?.averageRating || 0} (
+                    {infoBook?.volumeInfo?.ratingsCount || 0} ratings)
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={() => {}}>
+                  {/* <MaterialCommunityIcons
+                                   name={liked ? "heart" : "heart-outline"}
+                                   size={32}
+                                   color={liked ? "red" : "white"}
+                               /> */}
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+          <View style={{ width: "100%" }}>
+            <View style={{ marginTop: 5 }}>
+              <Text style={styles.synopsis}>Synopsis</Text>
+              {!showSynopsis && (
+                <Text style={{ fontFamily: "Roboto_400Regular_Italic" }}>
+                  {infoBook?.volumeInfo?.description?.substring(0, 450)}...
+                  <TouchableOpacity onPress={() => showFullSynopsis()}>
+                    <Text style={styles.showMore}>Show more</Text>
+                  </TouchableOpacity>
+                </Text>
+              )}
+              {showSynopsis && (
+                <Text style={{ fontFamily: "Roboto_400Regular_Italic" }}>
+                  {infoBook?.volumeInfo?.description}
+                  <TouchableOpacity onPress={() => showFullSynopsis()}>
+                    <Text style={styles.showMore}>Show less</Text>
+                  </TouchableOpacity>
+                </Text>
+              )}
+            </View>
+            <View style={styles.bottomContent}>
+              <Text style={{ fontFamily: "Oswald_500Medium" }}>
+                <Text style={styles.bottom}>Published:</Text>{" "}
+                {infoBook?.volumeInfo?.publishedDate || 0}
+              </Text>
+              <Text style={{ fontFamily: "Oswald_500Medium" }}>
+                <Text style={styles.bottom}>Pages:</Text>{" "}
+                {infoBook?.volumeInfo?.pageCount || 0}
+              </Text>
+            </View>
+            <View style={{ height: 10 }} />
+            {reviewList && reviewList.length > 0 && (
+              <FlatList
+                data={reviewList}
+                renderItem={({ item, index }) => {
+                  console.log({ item });
+                  return (
+                    <View
+                      style={{
+                        width: width - 40,
+                        marginLeft: 5,
+                        padding: 12,
+                        flexDirection: "row",
+                        marginVertical: 10,
+                        backgroundColor: "white",
+                        borderRadius: 8,
+                        shadowColor: "#000",
+                        shadowOffset: {
+                          width: 0,
+                          height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
 
-      <Text>BookDetail</Text>
+                        elevation: 5,
+                      }}
+                    >
+                      <Image
+                        source={{ uri: item.imageAvatar }}
+                        style={{ height: 50, width: 50, borderRadius: 50 / 2 }}
+                      />
+                      <View style={{ paddingLeft: 10 }}>
+                        <Text>{item.name}</Text>
+                        <Rating
+                          type="star"
+                          startingValue={item.rating || 0}
+                          readonly
+                          imageSize={15}
+                          style={{ paddingVertical: 10 }}
+                        />
+                        <Text>{item.review}</Text>
+                      </View>
+                    </View>
+                  );
+                }}
+              />
+            )}
+
+            <Rating
+              type="star"
+              startingValue={rating}
+              // ratingCount={rating}
+              imageSize={30}
+              style={{ paddingVertical: 10 }}
+              onFinishRating={(rating) => {
+                setRating(Number(rating));
+                console.log("abc rating", rating);
+              }}
+            />
+            <TextInputForm
+              placeholder={"Review"}
+              style={{
+                borderWidth: 1,
+                borderColor: theme.colors.placeholder,
+                borderRadius: 4,
+                paddingHorizontal: 12,
+                height: width / 2,
+              }}
+              inputStyle={{
+                height: width / 2,
+              }}
+              value={review}
+              multiline={true}
+              label="Review"
+              onChangeText={(text) => setReview(text)}
+              textAlignVertical={"top"}
+            />
+            <Button
+              title={"Submit"}
+              onPress={() => {
+                if (review && rating) {
+                  const key = firebase.database().ref("/Review").push().key;
+                  firebase
+                    .database()
+                    .ref("Review/" + key)
+                    .update({
+                      uid: firebase.auth().currentUser.uid,
+                      imageAvatar: firebase.auth().currentUser.photoURL,
+                      name: firebase.auth().currentUser.displayName,
+                      idBook: infoBook?.id,
+                      rating: Number(rating),
+                      review,
+                    })
+                    .then(() => {
+                      setRating(Number(0));
+
+                      setReview("");
+                      firebase
+                        .database()
+                        .ref("Book/" + infoBook?.id)
+                        .update({
+                          volumeInfo: {
+                            ...infoBook?.volumeInfo,
+                            ratingsCount: infoBook?.volumeInfo?.ratingsCount
+                              ? infoBook?.volumeInfo?.ratingsCount + 1
+                              : 1,
+                          },
+                        });
+                      Alert.alert("Success", "successful evaluation");
+                    })
+                    .catch(() => {
+                      Alert.alert("Error", "error evaluation");
+                    });
+                } else {
+                  Alert.alert("Error", "Please complete review with rating");
+                }
+              }}
+              backgroundColor={theme.colors.blue}
+            />
+          </View>
+        </View>
+      </ScrollView>
     </View>
-  )
-}
+  );
+};
 
-export default BookDetail
+export default BookDetail;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.white,
+  },
+  imageContainer: {
+    display: "flex",
+    alignItems: "center",
+    paddingBottom: 20,
+  },
+  titleInfo: {
+    alignItems: "center",
+    padding: 5,
+  },
+  title: {
+    // fontWeight: 'bold',
+    fontSize: 20,
+    fontFamily: "Oswald_700Bold",
+  },
+  author: {
+    color: "grey",
+    fontSize: 14,
+    fontFamily: "Oswald_500Medium",
+  },
+  rating: {
+    display: "flex",
+    flexDirection: "row",
+  },
+  ratingNumber: {
+    padding: 15,
+    fontFamily: "Oswald_500Medium",
+  },
+  tinyLogo: {
+    width: 130,
+    height: 200,
+  },
+  synopsis: {
+    // fontWeight: 'bold',
+    fontSize: 18,
+    paddingBottom: 10,
+    fontFamily: "Oswald_700Bold",
+  },
+  showMore: {
+    textDecorationLine: "underline",
+    color: "teal",
+    fontSize: 14,
+  },
+  bottomContent: {
+    width: "100%",
+    flexDirection: "row",
+    marginTop: 15,
+    justifyContent: "space-between",
   },
 });

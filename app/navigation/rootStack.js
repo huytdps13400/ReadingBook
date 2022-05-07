@@ -55,6 +55,10 @@ const RootStack = () => {
                 name={routesName.CHANGE_PASSWORD_SCREEN}
                 component={bottom.ChangePasswordScreen}
               />
+                  <Stack.Screen
+                name={routesName.BOOK_DETAIL_SCREEN}
+                component={bottom.BookDetail}
+              />
             </>
           ) : (
             <>

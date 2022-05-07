@@ -8,7 +8,29 @@ import {
 import React, { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { theme } from "../../theme";
-
+import {
+  useFonts,
+  Roboto_100Thin,
+  Roboto_100Thin_Italic,
+  Roboto_300Light,
+  Roboto_300Light_Italic,
+  Roboto_400Regular,
+  Roboto_400Regular_Italic,
+  Roboto_500Medium,
+  Roboto_500Medium_Italic,
+  Roboto_700Bold,
+  Roboto_700Bold_Italic,
+  Roboto_900Black,
+  Roboto_900Black_Italic,
+} from '@expo-google-fonts/roboto';
+import {
+  Oswald_200ExtraLight,
+  Oswald_300Light,
+  Oswald_400Regular,
+  Oswald_500Medium,
+  Oswald_600SemiBold,
+  Oswald_700Bold,
+} from '@expo-google-fonts/oswald';
 const TextInputForm = ({
   style,
   inputStyle,
@@ -17,10 +39,31 @@ const TextInputForm = ({
   label,
   ...rest
 }) => {
+  let [fontsLoaded] = useFonts({
+    Roboto_100Thin,
+    Roboto_100Thin_Italic,
+    Roboto_300Light,
+    Roboto_300Light_Italic,
+    Roboto_400Regular,
+    Roboto_400Regular_Italic,
+    Roboto_500Medium,
+    Roboto_500Medium_Italic,
+    // Roboto_700Bold,
+    Roboto_700Bold_Italic,
+    Roboto_900Black,
+    // Roboto_900Black_Italic,
+    Oswald_200ExtraLight,
+    Oswald_300Light,
+    Oswald_400Regular,
+    Oswald_500Medium,
+    Oswald_600SemiBold,
+    Oswald_700Bold,
+});
   const [isSecure, setIsSecure] = useState(true);
   return (
     <>
-      {label && <Text style={{ marginBottom: 5 }}>{label}</Text>}
+      {label && <Text style={{ marginBottom: 5 ,          fontFamily:'Roboto_500Medium'
+}}>{label}</Text>}
       <View
         style={[
           {
@@ -33,7 +76,7 @@ const TextInputForm = ({
         ]}
       >
         <TextInput
-          style={[inputStyle, { flex: 1 }]}
+          style={[inputStyle, { flex: 1 ,fontFamily:'Roboto_500Medium'}]}
           {...rest}
           secureTextEntry={isSecure && issecure}
           underlineColorAndroid="transparent"

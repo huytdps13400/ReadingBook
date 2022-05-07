@@ -4,7 +4,51 @@ import Icons from "@expo/vector-icons/Ionicons";
 import { theme } from "../../theme";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
+import {
+  useFonts,
+  Roboto_100Thin,
+  Roboto_100Thin_Italic,
+  Roboto_300Light,
+  Roboto_300Light_Italic,
+  Roboto_400Regular,
+  Roboto_400Regular_Italic,
+  Roboto_500Medium,
+  Roboto_500Medium_Italic,
+  Roboto_700Bold,
+  Roboto_700Bold_Italic,
+  Roboto_900Black,
+  Roboto_900Black_Italic,
+} from '@expo-google-fonts/roboto';
+import {
+  Oswald_200ExtraLight,
+  Oswald_300Light,
+  Oswald_400Regular,
+  Oswald_500Medium,
+  Oswald_600SemiBold,
+  Oswald_700Bold,
+} from '@expo-google-fonts/oswald';
+
 const Header = ({ title }) => {
+   let [fontsLoaded] = useFonts({
+    Roboto_100Thin,
+    Roboto_100Thin_Italic,
+    Roboto_300Light,
+    Roboto_300Light_Italic,
+    Roboto_400Regular,
+    Roboto_400Regular_Italic,
+    Roboto_500Medium,
+    Roboto_500Medium_Italic,
+    // Roboto_700Bold,
+    Roboto_700Bold_Italic,
+    Roboto_900Black,
+    // Roboto_900Black_Italic,
+    Oswald_200ExtraLight,
+    Oswald_300Light,
+    Oswald_400Regular,
+    Oswald_500Medium,
+    Oswald_600SemiBold,
+    Oswald_700Bold,
+});
   const navigation = useNavigation();
   return (
     <>
@@ -16,7 +60,7 @@ const Header = ({ title }) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icons name="arrow-back" size={24} color={"#fff"} />
         </TouchableOpacity>
-        <Text style={styles.title}>{title}</Text>
+       {fontsLoaded&& (<Text style={styles.title}>{title}</Text>)} 
       </View>
     </>
   );
@@ -38,5 +82,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "white",
+    fontFamily:'Oswald_700Bold'
   },
 });
