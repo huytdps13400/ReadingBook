@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, Keyboard } from "react-native";
+import { View, Text, StyleSheet, Image, Keyboard, Alert } from "react-native";
 import React, { useState } from "react";
 import FormContainer from "../../../components/FormContainer";
 import TextInputForm from "../../../components/TextInputForm";
@@ -13,8 +13,6 @@ import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signupSchema } from "./signupValidation";
 import { firebase } from "../../../../config/firebaseconfig";
-
-
 
 const SignUpScreen = () => {
   const inset = useSafeAreaInsets();
@@ -33,36 +31,49 @@ const SignUpScreen = () => {
       email: "",
       password: "",
       passwordConfirmation: "",
-      age:""
+      age: "",
     },
     mode: "onChange",
     resolver: yupResolver(signupSchema),
   });
   const onSubmit = handleSubmit(
-    ({ email, password, address, phone, username ,age}) => {
+    ({ email, password, address, phone, username, age }) => {
       Keyboard.dismiss();
       setIsLoadingSignUp(true);
-    firebase.default.auth().createUserWithEmailAndPassword( email, password)
+      firebase.default
+        .auth()
+        .createUserWithEmailAndPassword(email, password)
         .then(() => {
           const uid = firebase.default.auth().currentUser.uid;
-          const reference = firebase.default.database().ref('User/'+uid)
+          const reference = firebase.default.database().ref("User/" + uid);
 
-          firebase.default.database().ref(reference).update({ username,
-            address,
-            phone,
-            email,
-            age,
-            uid: uid,}).then(()=>{
+          firebase.default
+            .database()
+            .ref(reference)
+            .update({ username, address, phone, email, age, uid: uid })
+            .then(() => {
               setIsLoadingSignUp(false);
-            }).catch((error)=>{
-              console.log({error})
+              firebase.auth().currentUser.updateProfile({
+                displayName: username,
+                photoURL: "https://freesvg.org/img/myAvatar.png",
+              });
+            })
+            .catch((error) => {
+              console.log({ error });
             });
-       
+
           // setTimeout(() => {
           //   navigation.navigate(routesName.LOGIN_SCREEN);
           // }, 500);
         })
         .catch((error) => {
+          const { message } = error;
+          Alert.alert("Error", message, [
+            {
+              text: "OK",
+              style: "cancel",
+            },
+          ]);
           setIsLoadingSignUp(false);
 
           console.log(error);
@@ -151,7 +162,7 @@ const SignUpScreen = () => {
               />
             )}
           />
-  <Controller
+          <Controller
             name="age"
             control={control}
             render={({ field: { onChange, value } }) => (
