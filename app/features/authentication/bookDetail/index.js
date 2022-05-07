@@ -170,9 +170,7 @@ const BookDetail = ({ route }) => {
                 />
               </View>
               <View style={styles.titleInfo}>
-                <Text style={styles.title}>
-                  {infoBook?.volumeInfo?.title} {infoBook?.id}
-                </Text>
+                <Text style={styles.title}>{infoBook?.volumeInfo?.title}</Text>
                 <Text style={styles.author}>
                   by {infoBook?.volumeInfo?.authors}
                 </Text>
