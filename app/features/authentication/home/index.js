@@ -208,7 +208,7 @@ const HomeScreen = () => {
           {typeof item?.volumeInfo?.authors !== "undefined" &&
             item?.volumeInfo?.authors.map((item, index) => {
               return (
-                <Text style={{ fontSize: 16, marginBottom: 10 }}>
+                <Text style={{ fontSize: 16, marginBottom: 10 }} key={index}>
                   by {item}
                 </Text>
               );
