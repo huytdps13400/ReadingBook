@@ -264,7 +264,9 @@ const BookDetail = ({ route }) => {
                         style={{ height: 50, width: 50, borderRadius: 50 / 2 }}
                       />
                       <View style={{ paddingLeft: 10 }}>
-                        <Text>{item.name}</Text>
+                        <Text style={{ fontFamily: "Roboto_500Medium" }}>
+                          {item.name}
+                        </Text>
                         <Rating
                           type="star"
                           startingValue={item.rating || 0}
@@ -272,7 +274,9 @@ const BookDetail = ({ route }) => {
                           imageSize={15}
                           style={{ paddingVertical: 10 }}
                         />
-                        <Text>{item.review}</Text>
+                        <Text style={{ fontFamily: "Roboto_500Medium" }}>
+                          {item.review}
+                        </Text>
                       </View>
                     </View>
                   );
