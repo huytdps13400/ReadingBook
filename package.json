@@ -42,6 +42,7 @@
     "react-native-uuid": "^2.0.1",
     "react-native-web": "0.17.1",
     "react-redux": "^7.2.6",
+    "redux-thunk": "^2.4.1",
     "yup": "^0.32.11"
   },
   "devDependencies": {

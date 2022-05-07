@@ -25,6 +25,29 @@ export const ALL_EBOOKS_ENDPOInT = "/v1/volumes?q=";
 export const FREE_BOOKS_ENPOINT = "/v1/volumes?q=flowers&filter=free-ebooks";
 import { useDispatch } from "react-redux";
 import { setBook } from "../../../Redux/reduxSlice";
+import {
+  useFonts,
+  Roboto_100Thin,
+  Roboto_100Thin_Italic,
+  Roboto_300Light,
+  Roboto_300Light_Italic,
+  Roboto_400Regular,
+  Roboto_400Regular_Italic,
+  Roboto_500Medium,
+  Roboto_500Medium_Italic,
+  Roboto_700Bold,
+  Roboto_700Bold_Italic,
+  Roboto_900Black,
+  Roboto_900Black_Italic,
+} from "@expo-google-fonts/roboto";
+import {
+  Oswald_200ExtraLight,
+  Oswald_300Light,
+  Oswald_400Regular,
+  Oswald_500Medium,
+  Oswald_600SemiBold,
+  Oswald_700Bold,
+} from "@expo-google-fonts/oswald";
 
 export async function getData(url, endpoint) {
   try {
@@ -66,6 +89,26 @@ const HomeScreen = () => {
   const [DataBook, setDataBook] = useState([]);
   const [keyword, setKeyword] = useState("");
   const dispatch = useDispatch();
+  let [fontsLoaded] = useFonts({
+    Roboto_100Thin,
+    Roboto_100Thin_Italic,
+    Roboto_300Light,
+    Roboto_300Light_Italic,
+    Roboto_400Regular,
+    Roboto_400Regular_Italic,
+    Roboto_500Medium,
+    Roboto_500Medium_Italic,
+    // Roboto_700Bold,
+    Roboto_700Bold_Italic,
+    Roboto_900Black,
+    // Roboto_900Black_Italic,
+    Oswald_200ExtraLight,
+    Oswald_300Light,
+    Oswald_400Regular,
+    Oswald_500Medium,
+    Oswald_600SemiBold,
+    Oswald_700Bold,
+  });
   // useEffect(async () => {
   //   const userRef = firebase.default.database().ref('/Book');
 
@@ -87,22 +130,20 @@ const HomeScreen = () => {
   useEffect(async () => {
     await getAllEbooks(keyword).then((res) => {
       setDataBook(res.items);
-      console.log({ data: res.items });
     });
   }, [isFocused, keyword]);
 
   useEffect(() => {
     const BookRef = firebase.default.database().ref("/Book");
     const data = [];
-    const OnLoadingListener = BookRef.on("value", (snapshot) => {
+    const OnLoadingListener = BookRef.once("value", (snapshot) => {
       snapshot.forEach(function (childSnapshot) {
+        if (!childSnapshot) return;
         data.push(childSnapshot.val());
       });
       dispatch(setBook(data));
     });
-    return () => {
-      BookRef.off("value", OnLoadingListener);
-    };
+    return () => {};
   }, [isFocused]);
   const _renderItem = ({ item, index }) => {
     return (
@@ -111,6 +152,12 @@ const HomeScreen = () => {
           borderRadius: 5,
           height: 200,
           width: width - 32,
+        }}
+        style={{
+          height: 200,
+          width: width - 32,
+          elevation: 8,
+          backgroundColor: "white",
           shadowColor: "#000",
           shadowOffset: {
             width: 0,
@@ -118,11 +165,6 @@ const HomeScreen = () => {
           },
           shadowOpacity: 0.25,
           shadowRadius: 3.84,
-        }}
-        style={{
-          height: 200,
-          width: width - 32,
-          elevation: 8,
         }}
         resizeMode="contain"
         source={{
@@ -132,38 +174,39 @@ const HomeScreen = () => {
                   "zoom=1",
                   "zoom=2"
                 )
-              : "",
+              : "https://cogaidiem.com/wp-content/plugins/penci-portfolio//images/no-thumbnail.jpg",
         }}
       >
         <Text
           style={{
-            fontSize: 30,
+            fontSize: 20,
             position: "absolute",
             bottom: 50,
             left: 10,
             color: "black",
+            fontFamily: "Oswald_500Medium",
           }}
         >
           {item?.volumeInfo?.title}
         </Text>
-        <Text
-          style={{
-            fontSize: 20,
-            position: "absolute",
-            bottom: 20,
-            left: 10,
-            color: "black",
-          }}
-        >
-          {item.author}
-        </Text>
+        {item?.volumeInfo?.authors ? (
+          <Text
+            style={{
+              fontSize: 16,
+              position: "absolute",
+              bottom: 20,
+              left: 10,
+              color: "black",
+              fontFamily: "Oswald_300Light",
+            }}
+          >
+            by {item?.volumeInfo?.authors}
+          </Text>
+        ) : null}
       </ImageBackground>
     );
   };
   const _renderItemBook = ({ item, index }) => {
-    console.log("rating", item.volumeInfo?.ratingsCount);
-    const category = dataCategory.filter((v) => v?.value === item?.category)[0]
-      ?.label;
     return (
       <View
         style={{
@@ -187,20 +230,31 @@ const HomeScreen = () => {
         {item.volumeInfo?.imageLinks?.thumbnail && (
           <Image
             resizeMode="cover"
-            style={{ width: (width - 32) * 0.5, height: 300 }}
+            style={{
+              width: (width - 32) * 0.5,
+              height: 300,
+              borderTopLeftRadius: 8,
+              borderBottomLeftRadius: 8,
+            }}
             source={{
               uri:
                 item.volumeInfo?.imageLinks?.thumbnail.replace(
                   "zoom=1",
                   "zoom=1"
-                ) || null,
+                ) ||
+                "https://cogaidiem.com/wp-content/plugins/penci-portfolio//images/no-thumbnail.jpg",
             }}
           />
         )}
 
         <View style={{ width: (width - 32) * 0.5, paddingLeft: 10 }}>
           <Text
-            style={{ fontSize: 19, marginBottom: 10, fontWeight: "bold" }}
+            style={{
+              fontSize: 19,
+              marginBottom: 10,
+              fontWeight: "bold",
+              fontFamily: "Oswald_700Bold",
+            }}
             numberOfLines={3}
           >
             {item?.volumeInfo?.title}
@@ -208,7 +262,14 @@ const HomeScreen = () => {
           {typeof item?.volumeInfo?.authors !== "undefined" &&
             item?.volumeInfo?.authors.map((item, index) => {
               return (
-                <Text style={{ fontSize: 16, marginBottom: 10 }} key={index}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    marginBottom: 10,
+                    fontFamily: "Oswald_500Medium",
+                  }}
+                  key={index}
+                >
                   by {item}
                 </Text>
               );
@@ -216,10 +277,23 @@ const HomeScreen = () => {
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <Text style={{ fontSize: 16, fontWeight: "600" }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "600",
+                fontFamily: "Oswald_300Light",
+              }}
+            >
               Page: {item.volumeInfo.pageCount || 0}
             </Text>
-            <Text style={{ fontSize: 16, fontWeight: "600", marginRight: 5 }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "600",
+                marginRight: 5,
+                fontFamily: "Oswald_300Light",
+              }}
+            >
               Rating: {item.volumeInfo.averageRating || 0}
             </Text>
           </View>
@@ -239,7 +313,15 @@ const HomeScreen = () => {
               justifyContent: "center",
             }}
           >
-            <Text style={{ fontSize: 18, fontWeight: "600" }}>Detail</Text>
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: "600",
+                fontFamily: "Oswald_500Medium",
+              }}
+            >
+              Detail
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -256,63 +338,107 @@ const HomeScreen = () => {
         }}
         showsVerticalScrollIndicator={false}
       >
-        <View style={{ paddingHorizontal: 16 }}>
-          <Text style={{ fontSize: 20, fontWeight: "bold" }}>DashBoard</Text>
-          <TextInputForm
-            style={{
-              marginVertical: 10,
-              borderRadius: 4,
-              borderWidth: 1,
-              paddingHorizontal: 12,
-              borderColor: theme.colors.lightGray,
-            }}
-            placeholder="Search Keyword...."
-            value={keyword}
-            onChangeText={(text) => handleKeyword(text)}
-          />
-          <View style={{ height: 30 }} />
-          {DataBook ? (
-            <Carousel
-              data={DataBook?.slice(0, 5)}
-              renderItem={_renderItem}
-              sliderWidth={width - 32}
-              itemWidth={width - 32}
-              loop
-              autoplay
-              autoplayDelay={3000}
-              horizontal
-            />
-          ) : null}
+        <>
+          {fontsLoaded && (
+            <>
+              <View style={{ paddingHorizontal: 16 }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: "bold",
+                      fontFamily: "Oswald_700Bold",
+                    }}
+                  >
+                    DashBoard
+                  </Text>
+                  <Image
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderColor: "red",
+                      borderRadius: 20,
+                      borderWidth: 0.5,
+                    }}
+                    source={{ uri: firebase.auth().currentUser?.photoURL }}
+                  />
+                </View>
 
-          <View style={{ height: 30 }} />
+                <TextInputForm
+                  style={{
+                    marginVertical: 10,
+                    borderRadius: 4,
+                    borderWidth: 1,
+                    paddingHorizontal: 12,
+                    borderColor: theme.colors.lightGray,
+                  }}
+                  placeholder="Search Keyword...."
+                  value={keyword}
+                  onChangeText={(text) => handleKeyword(text)}
+                />
+                <View style={{ height: 30 }} />
+                {DataBook ? (
+                  <Carousel
+                    data={DataBook?.slice(0, 5)}
+                    renderItem={_renderItem}
+                    sliderWidth={width - 32}
+                    itemWidth={width - 32}
+                    loop
+                    autoplay
+                    autoplayDelay={3000}
+                    horizontal
+                  />
+                ) : null}
 
-          <Text style={{ fontSize: 20, fontWeight: "bold" }}>List Book</Text>
-          <View style={{ height: 30 }} />
-        </View>
-        <FlatList
-          data={DataBook}
-          renderItem={_renderItemBook}
-          keyExtractor={(item, index) => item.id.toString()}
-          contentContainerStyle={{ flex: 1 }}
-          showsHorizontalScrollIndicator={false}
-          ItemSeparatorComponent={() => {
-            return <View style={{ width: 10 }} />;
-          }}
-          ListEmptyComponent={() => {
-            return (
-              <View
-                style={{
-                  height: "100%",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Text style={{ fontSize: 30 }}>No Data</Text>
+                <View style={{ height: 30 }} />
+
+                <Text
+                  style={{
+                    fontSize: 20,
+                    fontWeight: "bold",
+                    fontFamily: "Oswald_700Bold",
+                  }}
+                >
+                  List Book
+                </Text>
+                <View style={{ height: 30 }} />
               </View>
-            );
-          }}
-        />
-        <View style={{ height: inset.bottom + 100 }} />
+              <FlatList
+                data={DataBook}
+                renderItem={_renderItemBook}
+                keyExtractor={(item, index) => item.id.toString()}
+                contentContainerStyle={{ flex: 1 }}
+                showsHorizontalScrollIndicator={false}
+                ItemSeparatorComponent={() => {
+                  return <View style={{ width: 10 }} />;
+                }}
+                ListEmptyComponent={() => {
+                  return (
+                    <View
+                      style={{
+                        height: "100%",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text
+                        style={{ fontSize: 30, fontFamily: "Oswald_700Bold" }}
+                      >
+                        No Data
+                      </Text>
+                    </View>
+                  );
+                }}
+              />
+            </>
+          )}
+          <View style={{ height: inset.bottom + 100 }} />
+        </>
       </ScrollView>
     </View>
   );
@@ -323,6 +449,6 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.white,
+    backgroundColor: theme.colors.background,
   },
 });

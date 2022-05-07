@@ -20,7 +20,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Rating } from "react-native-elements";
-
+import { setReviewList } from "../../../Redux/reduxSlice";
 import {
   useFonts,
   Roboto_100Thin,
@@ -44,6 +44,8 @@ import {
   Oswald_600SemiBold,
   Oswald_700Bold,
 } from "@expo-google-fonts/oswald";
+import { useDispatch } from "react-redux";
+import { fetchUserById, setRatingCount } from "../../../Redux/reduxSlice";
 
 const { width } = Dimensions.get("window");
 
@@ -51,13 +53,17 @@ const BookDetail = ({ route }) => {
   const navigation = useNavigation();
   const inset = useSafeAreaInsets();
   const [showSynopsis, setShowSynopsis] = useState(false);
+  const dispatch = useDispatch();
 
   const isFocused = useIsFocused();
   const { item: bookDetail } = route.params || {};
   const [infoBook, setInfoBook] = useState({});
-  const [reviewList, setReviewList] = useState([]);
+  // const [reviewList, setReviewList] = useState([]);
 
   const bookAll = useSelector((state) => state.books.bookmark);
+  const reviewLists = useSelector((state) => state.books.reviewLists);
+  const ratingCounts = useSelector((state) => state.books.ratingCount);
+
   const [review, setReview] = useState("");
   const [rating, setRating] = useState(0);
 
@@ -81,7 +87,7 @@ const BookDetail = ({ route }) => {
     Oswald_600SemiBold,
     Oswald_700Bold,
   });
-  console.log({ bookAll });
+  // console.log({ bookAll });
   useEffect(() => {
     // console.log(
     //   "huy",
@@ -123,21 +129,17 @@ const BookDetail = ({ route }) => {
     setShowSynopsis((value) => !value);
     // console.log('message: ', bookMark)
   };
-  useEffect(async () => {
-    const userRef = firebase.default.database().ref("/Review");
-
-    const OnLoadingListener = userRef.on("value", (snapshot) => {
-      setReviewList([]);
-      snapshot.forEach(function (childSnapshot) {
-        if (infoBook?.id === childSnapshot.val()?.idBook) {
-          setReviewList((users) => [...users, childSnapshot.val()]);
-        }
-      });
-    });
-    return () => {
-      userRef.off("value", OnLoadingListener);
-    };
-  }, [isFocused, infoBook?.id]);
+  useEffect(() => {
+    if (infoBook?.id) {
+      dispatch(fetchUserById(infoBook?.id));
+    }
+  }, [infoBook?.id, isFocused]);
+  useEffect(() => {
+    if (infoBook?.volumeInfo?.ratingsCount) {
+      dispatch(setRatingCount(infoBook?.volumeInfo?.ratingsCount));
+    }
+  }, [infoBook?.id, isFocused]);
+  console.log({ ratingCounts });
   return (
     <View style={[styles.container, { paddingTop: inset.top }]}>
       <Header title="Book Details" />
@@ -168,7 +170,9 @@ const BookDetail = ({ route }) => {
                 />
               </View>
               <View style={styles.titleInfo}>
-                <Text style={styles.title}>{infoBook?.volumeInfo?.title}</Text>
+                <Text style={styles.title}>
+                  {infoBook?.volumeInfo?.title} {infoBook?.id}
+                </Text>
                 <Text style={styles.author}>
                   by {infoBook?.volumeInfo?.authors}
                 </Text>
@@ -189,7 +193,7 @@ const BookDetail = ({ route }) => {
                   />
                   <Text style={styles.ratingNumber}>
                     {infoBook?.volumeInfo?.averageRating || 0} (
-                    {infoBook?.volumeInfo?.ratingsCount || 0} ratings)
+                    {ratingCounts || 0} ratings)
                   </Text>
                 </View>
                 <TouchableOpacity onPress={() => {}}>
@@ -233,9 +237,9 @@ const BookDetail = ({ route }) => {
               </Text>
             </View>
             <View style={{ height: 10 }} />
-            {reviewList && reviewList.length > 0 && (
+            {reviewLists && reviewLists.length > 0 && (
               <FlatList
-                data={reviewList}
+                data={reviewLists}
                 renderItem={({ item, index }) => {
                   console.log({ item });
                   return (
@@ -278,9 +282,41 @@ const BookDetail = ({ route }) => {
                           {item.review}
                         </Text>
                       </View>
+                      {item.uid === firebase.auth().currentUser.uid && (
+                        <MaterialCommunityIcons
+                          name="window-close"
+                          size={24}
+                          color={"red"}
+                          style={{ position: "absolute", right: 10, top: 5 }}
+                          onPress={() => {
+                            firebase
+                              .database()
+                              .ref("Review/" + item.id)
+                              .remove()
+                              .then(() => {
+                                Alert.alert("Success", "successful evaluation");
+                                const arrayData = reviewLists?.filter(
+                                  (v) => v.id !== item.id
+                                );
+                                dispatch(setReviewList(arrayData));
+                                setTimeout(() => {
+                                  dispatch(
+                                    setRatingCount(
+                                      ratingCounts ? ratingCounts - 1 : 1
+                                    )
+                                  );
+                                }, 500);
+                              })
+                              .catch(() => {
+                                Alert.alert("Error", "error evaluation");
+                              });
+                          }}
+                        />
+                      )}
                     </View>
                   );
                 }}
+                keyExtractor={(item, index) => index.toString()}
               />
             )}
 
@@ -331,20 +367,43 @@ const BookDetail = ({ route }) => {
                     })
                     .then(() => {
                       setRating(Number(0));
-
+                      const data = {
+                        uid: firebase.auth().currentUser.uid,
+                        imageAvatar: firebase.auth().currentUser.photoURL,
+                        name: firebase.auth().currentUser.displayName,
+                        idBook: infoBook?.id,
+                        rating: Number(rating),
+                        review,
+                      };
+                      const arrayData = [...reviewLists, data];
+                      // setReviewList((value) => [...value, data]);
+                      dispatch(setReviewList(arrayData));
                       setReview("");
-                      firebase
-                        .database()
-                        .ref("Book/" + infoBook?.id)
-                        .update({
-                          volumeInfo: {
-                            ...infoBook?.volumeInfo,
-                            ratingsCount: infoBook?.volumeInfo?.ratingsCount
-                              ? infoBook?.volumeInfo?.ratingsCount + 1
-                              : 1,
-                          },
-                        });
-                      Alert.alert("Success", "successful evaluation");
+                      setTimeout(() => {
+                        firebase
+                          .database()
+                          .ref("Book/" + infoBook?.id)
+                          .update({
+                            volumeInfo: {
+                              ...infoBook?.volumeInfo,
+                              ratingsCount: ratingCounts ? ratingCounts + 1 : 1,
+                            },
+                          })
+                          .then(() => {
+                            setTimeout(() => {
+                              dispatch(
+                                setRatingCount(
+                                  ratingCounts ? ratingCounts + 1 : 1
+                                )
+                              );
+                            }, 500);
+
+                            Alert.alert("Success", "successful evaluation");
+                          })
+                          .catch((error) => {
+                            Alert.alert("Success", error?.message);
+                          });
+                      }, 1000);
                     })
                     .catch(() => {
                       Alert.alert("Error", "error evaluation");
