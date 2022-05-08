@@ -11,6 +11,7 @@ import React, { useState, useEffect } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { theme } from "../../../theme";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
+import { routesName } from "../../../navigation/routes";
 import {
   useFonts,
   Roboto_100Thin,
@@ -42,7 +43,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 
 const { width } = Dimensions.get("window");
-let bookOptions = ["Want to Read", "Start Reading", "Read", "Watched"];
+let bookOptions = ["Want to Read", "Start Reading", "Read", "Favorite Book"];
 
 const FavoriteScreen = () => {
   const inset = useSafeAreaInsets();
@@ -75,11 +76,7 @@ const FavoriteScreen = () => {
 
   useEffect(() => {
     if (isFocused) {
-      if (type === "Watched") {
-        dispatch(fetchBookUser(null));
-      } else {
-        dispatch(fetchFavoriteUser(type));
-      }
+      dispatch(fetchFavoriteUser(type));
     }
   }, [type, isFocused]);
 
@@ -260,7 +257,7 @@ const FavoriteScreen = () => {
           <FlatList
             style={{ flex: 1 }}
             showsVerticalScrollIndicator={false}
-            data={type === "Watched" ? bookUser : bookFavorite}
+            data={bookFavorite}
             renderItem={_renderItemBook}
             keyExtractor={(item, index) => index.toString()}
           />

@@ -50,7 +50,13 @@ import {
 } from "@expo-google-fonts/oswald";
 import { useDispatch } from "react-redux";
 import { fetchUserById, setRatingCount } from "../../../Redux/reduxSlice";
-let bookOptions = ["Want to Read", "Start Reading", "Read", "Cancel"];
+let bookOptions = [
+  "Want to Read",
+  "Start Reading",
+  "Read",
+  "Favorite Book",
+  "Cancel",
+];
 
 const { width } = Dimensions.get("window");
 
@@ -152,31 +158,31 @@ const BookDetail = ({ route }) => {
         //   });
         setInfoBook(bookDetail);
       }
-      if (bookUser?.filter((v) => v.id === bookDetail?.id)[0]) {
-      } else {
-        firebase.default
-          .database()
-          .ref("BookUser/" + bookDetail?.id)
-          .update(
-            Object.assign(bookDetail, { uid: firebase.auth().currentUser.uid })
-          )
-          .then(() => {
-            // Alert.alert(
-            //         "Success",
-            //         "Congratulations on your successful save",
-            //         [
-            //           {
-            //             text: "OK",
-            //             onPress: () =>
-            //               navigation.navigate(routesName.HOME_SCREEN),
-            //           },
-            //         ]
-            //       );
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      }
+      // if (bookUser?.filter((v) => v.id === bookDetail?.id)[0]) {
+      // } else {
+      //   firebase.default
+      //     .database()
+      //     .ref("BookUser/" + bookDetail?.id)
+      //     .update(
+      //       Object.assign(bookDetail, { uid: firebase.auth().currentUser.uid })
+      //     )
+      //     .then(() => {
+      //       // Alert.alert(
+      //       //         "Success",
+      //       //         "Congratulations on your successful save",
+      //       //         [
+      //       //           {
+      //       //             text: "OK",
+      //       //             onPress: () =>
+      //       //               navigation.navigate(routesName.HOME_SCREEN),
+      //       //           },
+      //       //         ]
+      //       //       );
+      //     })
+      //     .catch((error) => {
+      //       console.error(error);
+      //     });
+      // }
     } catch (error) {
       console.log({ error });
     }
@@ -510,7 +516,7 @@ const BookDetail = ({ route }) => {
                   key={i}
                   // containerStyle={l.containerStyle}
                   onPress={() => {
-                    if (i !== 3) {
+                    if (i !== 4) {
                       setOpenSheet(false);
                       const key = firebase
                         .database()
