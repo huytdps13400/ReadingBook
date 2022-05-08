@@ -18,6 +18,38 @@ export const fetchUserById = createAsyncThunk(
   }
 );
 
+export const fetchFavoriteUser = createAsyncThunk(
+  "books/favoriteUser",
+  async (type, thunkAPI) => {
+    const userRef = firebase.default.database().ref("/Favorite");
+    const data = [];
+    console.log({ type });
+    await userRef.once("value", (snapshot) => {
+      snapshot.forEach(function (childSnapshot) {
+        if (type) {
+          if (
+            firebase.auth().currentUser.uid === childSnapshot.val()?.uid &&
+            type === childSnapshot.val()?.type
+          ) {
+            const dataFilterBooks = thunkAPI
+              .getState()
+              .books.bookmark?.filter(
+                (v) => v.id === childSnapshot.val()?.idBook
+              )[0];
+            data.push(dataFilterBooks);
+          }
+        } else {
+          console.log("isCHeck---");
+          if (firebase.auth().currentUser.uid === childSnapshot.val()?.uid) {
+            data.push({ ...childSnapshot.val(), id: childSnapshot.key });
+          }
+        }
+      });
+    });
+    return data;
+  }
+);
+
 export const fetchUserReview = createAsyncThunk(
   "books/reviewsUser",
   async (bookAll, thunkAPI) => {
@@ -34,7 +66,10 @@ export const fetchUserReview = createAsyncThunk(
         }
       });
     });
-    return data;
+    const filterData = data.filter((item, index) => {
+      return data.indexOf(item) === index;
+    });
+    return filterData;
   }
 );
 const reduxSlice = createSlice({
@@ -51,7 +86,7 @@ const reduxSlice = createSlice({
     likedBooks: [],
     reviewLists: [],
     reviewListsUser: [],
-
+    bookFavorite: [],
     ratingCount: 0,
   },
   reducers: {
@@ -69,6 +104,9 @@ const reduxSlice = createSlice({
     },
     setReviewList(state, action) {
       state.reviewLists = action.payload;
+    },
+    setFavoriteList(state, action) {
+      state.bookFavorite = action.payload;
     },
     setRatingCount(state, action) {
       state.ratingCount = action.payload;
@@ -101,8 +139,22 @@ const reduxSlice = createSlice({
       console.log({ action: action.payload });
       state.reviewListsUser = action.payload;
     });
+    builder.addCase(fetchFavoriteUser.pending, (state, action) => {
+      // Add user to the state array
+      state.bookFavorite = [];
+    });
+    builder.addCase(fetchFavoriteUser.rejected, (state, action) => {
+      // Add user to the state array
+      state.bookFavorite = [];
+    });
+    builder.addCase(fetchFavoriteUser.fulfilled, (state, action) => {
+      // Add user to the state array
+      console.log({ action: action.payload });
+      state.bookFavorite = action.payload;
+    });
   },
 });
 
-export const { setBook, setReviewList, setRatingCount } = reduxSlice.actions;
+export const { setBook, setReviewList, setRatingCount, setFavoriteList } =
+  reduxSlice.actions;
 export default reduxSlice.reducer;

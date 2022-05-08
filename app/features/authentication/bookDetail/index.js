@@ -19,8 +19,12 @@ import { useNavigation, useIsFocused } from "@react-navigation/core";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Rating } from "react-native-elements";
-import { setReviewList } from "../../../Redux/reduxSlice";
+import { Rating, BottomSheet, ListItem } from "react-native-elements";
+import {
+  fetchFavoriteUser,
+  setFavoriteList,
+  setReviewList,
+} from "../../../Redux/reduxSlice";
 import {
   useFonts,
   Roboto_100Thin,
@@ -46,6 +50,7 @@ import {
 } from "@expo-google-fonts/oswald";
 import { useDispatch } from "react-redux";
 import { fetchUserById, setRatingCount } from "../../../Redux/reduxSlice";
+let bookOptions = ["Want to Read", "Start Reading", "Read", "Cancel"];
 
 const { width } = Dimensions.get("window");
 
@@ -54,6 +59,7 @@ const BookDetail = ({ route }) => {
   const inset = useSafeAreaInsets();
   const [showSynopsis, setShowSynopsis] = useState(false);
   const dispatch = useDispatch();
+  const [openSheet, setOpenSheet] = useState(false);
 
   const isFocused = useIsFocused();
   const { item: bookDetail } = route.params || {};
@@ -63,6 +69,7 @@ const BookDetail = ({ route }) => {
   const bookAll = useSelector((state) => state.books.bookmark);
   const reviewLists = useSelector((state) => state.books.reviewLists);
   const ratingCounts = useSelector((state) => state.books.ratingCount);
+  const bookFavorite = useSelector((state) => state.books.bookFavorite);
 
   const [review, setReview] = useState("");
   const [rating, setRating] = useState(0);
@@ -132,6 +139,7 @@ const BookDetail = ({ route }) => {
   useEffect(() => {
     if (infoBook?.id) {
       dispatch(fetchUserById(infoBook?.id));
+      dispatch(fetchFavoriteUser(false));
     }
   }, [infoBook?.id, isFocused]);
   useEffect(() => {
@@ -139,7 +147,11 @@ const BookDetail = ({ route }) => {
       dispatch(setRatingCount(infoBook?.volumeInfo?.ratingsCount));
     }
   }, [infoBook?.id, isFocused]);
-  console.log({ ratingCounts });
+  console.log(
+    bookFavorite?.some((v) => v.idBook === infoBook?.id),
+    "kaka",
+    bookFavorite
+  );
   return (
     <View style={[styles.container, { paddingTop: inset.top }]}>
       <Header title="Book Details" />
@@ -194,12 +206,43 @@ const BookDetail = ({ route }) => {
                     {ratingCounts || 0} ratings)
                   </Text>
                 </View>
-                <TouchableOpacity onPress={() => {}}>
-                  {/* <MaterialCommunityIcons
-                                   name={liked ? "heart" : "heart-outline"}
-                                   size={32}
-                                   color={liked ? "red" : "white"}
-                               /> */}
+                <TouchableOpacity
+                  onPress={() => {
+                    if (bookFavorite?.some((v) => v.idBook === infoBook?.id)) {
+                      const id = bookFavorite?.filter(
+                        (v) => v.idBook === infoBook?.id
+                      )[0]?.id;
+                      firebase
+                        .database()
+                        .ref(`Favorite/${id}`)
+                        .remove()
+                        .then(() => {
+                          const dataFilter = bookFavorite?.filter(
+                            (v) => v.idBook !== infoBook?.id
+                          );
+                          setTimeout(() => {
+                            dispatch(setFavoriteList(dataFilter));
+                          }, 1000);
+                          Alert.alert("Success", "successful evaluation");
+                        })
+                        .catch((error) => {
+                          Alert.alert("Error", error.message);
+                        });
+                    } else {
+                      setOpenSheet(true);
+                    }
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name={
+                      bookFavorite?.some((v) => v.idBook === infoBook?.id)
+                        ? "heart"
+                        : "heart-outline"
+                    }
+                    // name="heart-outline"
+                    size={32}
+                    color={"red"}
+                  />
                 </TouchableOpacity>
               </View>
             </View>
@@ -412,6 +455,66 @@ const BookDetail = ({ route }) => {
               }}
               backgroundColor={theme.colors.blue}
             />
+            <BottomSheet modalProps={{}} isVisible={openSheet}>
+              {bookOptions.map((l, i) => (
+                <ListItem
+                  key={i}
+                  // containerStyle={l.containerStyle}
+                  onPress={() => {
+                    if (i !== 3) {
+                      setOpenSheet(false);
+                      const key = firebase
+                        .database()
+                        .ref("Favorite")
+                        .push().key;
+                      firebase
+                        .database()
+                        .ref("Favorite/" + key)
+                        .update({
+                          idBook: infoBook?.id,
+                          uid: firebase.auth().currentUser.uid,
+                          type: l,
+                        })
+                        .then(() => {
+                          const data = [
+                            ...bookFavorite,
+                            {
+                              idBook: infoBook?.id,
+                              uid: firebase.auth().currentUser.uid,
+                              type: l,
+                            },
+                          ];
+                          dispatch(setFavoriteList(data));
+                          Alert.alert("Success", "successful evaluation");
+                        })
+                        .catch((error) => {
+                          Alert.alert("Success", error.message);
+                        });
+                    }
+                    setOpenSheet(false);
+                  }}
+                >
+                  <ListItem.Content>
+                    <ListItem.Title>
+                      <View style={styles.bottomSheet}>
+                        <Text>{l}</Text>
+                        {/* {i !== 3 && selectedOption === i ? (
+                          <Text>
+                            <Icon name="done" color="green" />
+                          </Text>
+                        ) : i === 3 ? (
+                          <Text>
+                            <Icon name="close" color="red" />
+                          </Text>
+                        ) : (
+                          <></>
+                        )} */}
+                      </View>
+                    </ListItem.Title>
+                  </ListItem.Content>
+                </ListItem>
+              ))}
+            </BottomSheet>
           </View>
         </View>
       </ScrollView>
@@ -472,5 +575,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginTop: 15,
     justifyContent: "space-between",
+  },
+  bottomSheet: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: 400,
   },
 });

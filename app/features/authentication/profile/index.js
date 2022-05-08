@@ -172,6 +172,7 @@ const ProfileScreen = () => {
               marginBottom: 10,
               fontWeight: "bold",
               fontFamily: "Oswald_700Bold",
+              maxWidth: (width - 32) * 0.45,
             }}
             numberOfLines={3}
           >
@@ -325,6 +326,7 @@ const ProfileScreen = () => {
             </View>
           </>
         )}
+        <View style={{ height: inset.bottom + 100 }} />
       </ScrollView>
     </View>
   );
