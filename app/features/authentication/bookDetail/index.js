@@ -132,6 +132,7 @@ const BookDetail = ({ route }) => {
             //       );
           })
           .catch((error) => {
+            console.log("hahaa", error);
             console.error(error);
           });
         // firebase.default

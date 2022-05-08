@@ -328,6 +328,9 @@ const HomeScreen = () => {
       </View>
     );
   };
+
+  console.log("lala", firebase.auth().currentUser?.photoURL);
+
   const handleKeyword = React.useCallback((text) => {
     setKeyword(text);
   }, []);
