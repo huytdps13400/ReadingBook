@@ -67,6 +67,8 @@ const BookDetail = ({ route }) => {
   // const [reviewList, setReviewList] = useState([]);
 
   const bookAll = useSelector((state) => state.books.bookmark);
+  const bookUser = useSelector((state) => state.books.bookUser);
+
   const reviewLists = useSelector((state) => state.books.reviewLists);
   const ratingCounts = useSelector((state) => state.books.ratingCount);
   const bookFavorite = useSelector((state) => state.books.bookFavorite);
@@ -126,7 +128,54 @@ const BookDetail = ({ route }) => {
           .catch((error) => {
             console.error(error);
           });
+        // firebase.default
+        //   .database()
+        //   .ref("BookUser/" + bookDetail?.id)
+        //   .update(
+        //     Object.assign(bookDetail, { uid: firebase.auth().currentUser.uid })
+        //   )
+        //   .then(() => {
+        //     // Alert.alert(
+        //     //         "Success",
+        //     //         "Congratulations on your successful save",
+        //     //         [
+        //     //           {
+        //     //             text: "OK",
+        //     //             onPress: () =>
+        //     //               navigation.navigate(routesName.HOME_SCREEN),
+        //     //           },
+        //     //         ]
+        //     //       );
+        //   })
+        //   .catch((error) => {
+        //     console.error(error);
+        //   });
         setInfoBook(bookDetail);
+      }
+      if (bookUser?.filter((v) => v.id === bookDetail?.id)[0]) {
+      } else {
+        firebase.default
+          .database()
+          .ref("BookUser/" + bookDetail?.id)
+          .update(
+            Object.assign(bookDetail, { uid: firebase.auth().currentUser.uid })
+          )
+          .then(() => {
+            // Alert.alert(
+            //         "Success",
+            //         "Congratulations on your successful save",
+            //         [
+            //           {
+            //             text: "OK",
+            //             onPress: () =>
+            //               navigation.navigate(routesName.HOME_SCREEN),
+            //           },
+            //         ]
+            //       );
+          })
+          .catch((error) => {
+            console.error(error);
+          });
       }
     } catch (error) {
       console.log({ error });

@@ -24,7 +24,7 @@ export const KEY_HEADER = " :keyes&key=" + API_BOOKS_KEY;
 export const ALL_EBOOKS_ENDPOInT = "/v1/volumes?q=";
 export const FREE_BOOKS_ENPOINT = "/v1/volumes?q=flowers&filter=free-ebooks";
 import { useDispatch } from "react-redux";
-import { setBook } from "../../../Redux/reduxSlice";
+import { fetchBookUser, setBook } from "../../../Redux/reduxSlice";
 import {
   useFonts,
   Roboto_100Thin,
@@ -143,6 +143,7 @@ const HomeScreen = () => {
       });
       dispatch(setBook(data));
     });
+    dispatch(fetchBookUser(null));
     return () => {};
   }, [isFocused]);
   const _renderItem = ({ item, index }) => {

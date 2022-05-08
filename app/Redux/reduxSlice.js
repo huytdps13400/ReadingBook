@@ -50,6 +50,23 @@ export const fetchFavoriteUser = createAsyncThunk(
   }
 );
 
+export const fetchBookUser = createAsyncThunk(
+  "books/bookUser",
+  async (userId, thunkAPI) => {
+    const userRef = firebase.default.database().ref("/BookUser");
+    const data = [];
+    console.log({ userId });
+    await userRef.once("value", (snapshot) => {
+      snapshot.forEach(function (childSnapshot) {
+        if (firebase.auth().currentUser.uid === childSnapshot.val()?.uid) {
+          data.push({ ...childSnapshot.val(), id: childSnapshot.key });
+        }
+      });
+    });
+    return data;
+  }
+);
+
 export const fetchUserReview = createAsyncThunk(
   "books/reviewsUser",
   async (bookAll, thunkAPI) => {
@@ -88,7 +105,9 @@ const reduxSlice = createSlice({
     reviewListsUser: [],
     bookFavorite: [],
     ratingCount: 0,
+    bookUser: [],
   },
+
   reducers: {
     // setBookmark(state, action) {
     //   state.bookmark = action.payload
@@ -151,6 +170,19 @@ const reduxSlice = createSlice({
       // Add user to the state array
       console.log({ action: action.payload });
       state.bookFavorite = action.payload;
+    });
+    builder.addCase(fetchBookUser.pending, (state, action) => {
+      // Add user to the state array
+      state.bookUser = [];
+    });
+    builder.addCase(fetchBookUser.rejected, (state, action) => {
+      // Add user to the state array
+      state.bookUser = [];
+    });
+    builder.addCase(fetchBookUser.fulfilled, (state, action) => {
+      // Add user to the state array
+      console.log({ action: action.payload });
+      state.bookUser = action.payload;
     });
   },
 });

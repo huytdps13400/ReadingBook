@@ -16,7 +16,7 @@ export const TabBarAdvancedButton = ({ bgColor, ...props }) => (
   <View style={styles.container} pointerEvents="box-none">
     <TabBg color={bgColor} style={styles.background} />
     <TouchableOpacity style={styles.button} onPress={props.onPress}>
-      <Icon name="add-outline" size={24} color={"#fff"} />
+      <Icon name="heart" size={24} color={"#fff"} />
     </TouchableOpacity>
   </View>
 );

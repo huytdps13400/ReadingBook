@@ -34,11 +34,15 @@ import {
   Oswald_600SemiBold,
   Oswald_700Bold,
 } from "@expo-google-fonts/oswald";
-import { fetchUserById, fetchFavoriteUser } from "../../../Redux/reduxSlice";
+import {
+  fetchUserById,
+  fetchFavoriteUser,
+  fetchBookUser,
+} from "../../../Redux/reduxSlice";
 import { useSelector, useDispatch } from "react-redux";
 
 const { width } = Dimensions.get("window");
-let bookOptions = ["Want to Read", "Start Reading", "Read"];
+let bookOptions = ["Want to Read", "Start Reading", "Read", "Watched"];
 
 const FavoriteScreen = () => {
   const inset = useSafeAreaInsets();
@@ -67,10 +71,15 @@ const FavoriteScreen = () => {
   const [type, setType] = useState("Want to Read");
   const dispatch = useDispatch();
   const bookFavorite = useSelector((state) => state.books.bookFavorite);
+  const bookUser = useSelector((state) => state.books.bookUser);
 
   useEffect(() => {
     if (isFocused) {
-      dispatch(fetchFavoriteUser(type));
+      if (type === "Watched") {
+        dispatch(fetchBookUser(null));
+      } else {
+        dispatch(fetchFavoriteUser(type));
+      }
     }
   }, [type, isFocused]);
 
@@ -82,7 +91,7 @@ const FavoriteScreen = () => {
         }}
         key={index}
         style={{
-          width: (width - 47) / 3,
+          width: (width - 52) / 4,
           alignItems: "center",
           backgroundColor:
             type === item ? theme.colors.white : theme.colors.blue,
@@ -244,17 +253,20 @@ const FavoriteScreen = () => {
   return (
     <View style={[styles.container, { paddingTop: inset.top }]}>
       {fontsLoaded && (
-        <View style={{ paddingHorizontal: 16 }}>
+        <View style={{ paddingHorizontal: 16, flex: 1 }}>
           <View style={{ flexDirection: "row" }}>
             {bookOptions.map(renderItemTab)}
           </View>
           <FlatList
-            data={bookFavorite}
+            style={{ flex: 1 }}
+            showsVerticalScrollIndicator={false}
+            data={type === "Watched" ? bookUser : bookFavorite}
             renderItem={_renderItemBook}
             keyExtractor={(item, index) => index.toString()}
           />
         </View>
       )}
+      <View style={{ height: inset.bottom + 100 }} />
     </View>
   );
 };
