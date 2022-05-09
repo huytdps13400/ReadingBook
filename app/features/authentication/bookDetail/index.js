@@ -55,6 +55,7 @@ let bookOptions = [
   "Start Reading",
   "Read",
   "Favorite Book",
+  "Cancel Favorite Book",
   "Cancel",
 ];
 
@@ -265,25 +266,26 @@ const BookDetail = ({ route }) => {
                 <TouchableOpacity
                   onPress={() => {
                     if (bookFavorite?.some((v) => v.idBook === infoBook?.id)) {
-                      const id = bookFavorite?.filter(
-                        (v) => v.idBook === infoBook?.id
-                      )[0]?.id;
-                      firebase
-                        .database()
-                        .ref(`Favorite/${id}`)
-                        .remove()
-                        .then(() => {
-                          const dataFilter = bookFavorite?.filter(
-                            (v) => v.idBook !== infoBook?.id
-                          );
-                          setTimeout(() => {
-                            dispatch(setFavoriteList(dataFilter));
-                          }, 1000);
-                          Alert.alert("Success", "successful evaluation");
-                        })
-                        .catch((error) => {
-                          Alert.alert("Error", error.message);
-                        });
+                      // const id = bookFavorite?.filter(
+                      //   (v) => v.idBook === infoBook?.id
+                      // )[0]?.id;
+                      // firebase
+                      //   .database()
+                      //   .ref(`Favorite/${id}`)
+                      //   .remove()
+                      //   .then(() => {
+                      //     const dataFilter = bookFavorite?.filter(
+                      //       (v) => v.idBook !== infoBook?.id
+                      //     );
+                      //     setTimeout(() => {
+                      //       dispatch(setFavoriteList(dataFilter));
+                      //     }, 1000);
+                      //     Alert.alert("Success", "successful evaluation");
+                      //   })
+                      //   .catch((error) => {
+                      //     Alert.alert("Error", error.message);
+                      //   });
+                      setOpenSheet(true);
                     } else {
                       setOpenSheet(true);
                     }
@@ -512,64 +514,139 @@ const BookDetail = ({ route }) => {
               backgroundColor={theme.colors.blue}
             />
             <BottomSheet modalProps={{}} isVisible={openSheet}>
-              {bookOptions.map((l, i) => (
-                <ListItem
-                  key={i}
-                  // containerStyle={l.containerStyle}
-                  onPress={() => {
-                    if (i !== 4) {
+              {bookOptions.map((l, i) => {
+                if (
+                  bookFavorite?.filter((v) => v.idBook === infoBook?.id)[0]
+                    ?.type === l
+                ) {
+                  return null;
+                }
+                if (
+                  !bookFavorite?.some((v) => v.idBook === infoBook?.id) &&
+                  l === "Cancel Favorite Book"
+                ) {
+                  return null;
+                }
+                return (
+                  <ListItem
+                    key={i}
+                    // containerStyle={l.containerStyle}
+                    onPress={() => {
+                      if (i !== 5) {
+                        setOpenSheet(false);
+                        if (i === 4) {
+                          if (
+                            bookFavorite?.some((v) => v.idBook === infoBook?.id)
+                          ) {
+                            const id = bookFavorite?.filter(
+                              (v) => v.idBook === infoBook?.id
+                            )[0]?.id;
+                            firebase
+                              .database()
+                              .ref(`Favorite/${id}`)
+                              .remove()
+                              .then(() => {
+                                const dataFilter = bookFavorite?.filter(
+                                  (v) => v.idBook !== infoBook?.id
+                                );
+                                setTimeout(() => {
+                                  dispatch(setFavoriteList(dataFilter));
+                                }, 1000);
+                                Alert.alert("Success", "successful evaluation");
+                              })
+                              .catch((error) => {
+                                Alert.alert("Error", error.message);
+                              });
+                          }
+                        } else {
+                          if (
+                            bookFavorite?.some((v) => v.idBook === infoBook?.id)
+                          ) {
+                            // const key = firebase
+                            // .database()
+                            // .ref("Favorite")
+                            // .push().key;
+                            const id = bookFavorite?.filter(
+                              (v) => v.idBook === infoBook?.id
+                            )[0]?.id;
+                            firebase
+                              .database()
+                              .ref("Favorite/" + id)
+                              .update({
+                                idBook: infoBook?.id,
+                                uid: firebase.auth().currentUser.uid,
+                                type: l,
+                              })
+                              .then(() => {
+                                // const data = [
+                                //   ...bookFavorite,
+                                //   {
+                                //     idBook: infoBook?.id,
+                                //     uid: firebase.auth().currentUser.uid,
+                                //     type: l,
+                                //   },
+                                // ];
+                                // dispatch(setFavoriteList(data));
+                                Alert.alert("Success", "successful evaluation");
+                              })
+                              .catch((error) => {
+                                Alert.alert("Success", error.message);
+                              });
+                          } else {
+                            const key = firebase
+                              .database()
+                              .ref("Favorite")
+                              .push().key;
+                            firebase
+                              .database()
+                              .ref("Favorite/" + key)
+                              .update({
+                                idBook: infoBook?.id,
+                                uid: firebase.auth().currentUser.uid,
+                                type: l,
+                              })
+                              .then(() => {
+                                const data = [
+                                  ...bookFavorite,
+                                  {
+                                    idBook: infoBook?.id,
+                                    uid: firebase.auth().currentUser.uid,
+                                    type: l,
+                                  },
+                                ];
+                                dispatch(setFavoriteList(data));
+                                Alert.alert("Success", "successful evaluation");
+                              })
+                              .catch((error) => {
+                                Alert.alert("Success", error.message);
+                              });
+                          }
+                        }
+                      }
                       setOpenSheet(false);
-                      const key = firebase
-                        .database()
-                        .ref("Favorite")
-                        .push().key;
-                      firebase
-                        .database()
-                        .ref("Favorite/" + key)
-                        .update({
-                          idBook: infoBook?.id,
-                          uid: firebase.auth().currentUser.uid,
-                          type: l,
-                        })
-                        .then(() => {
-                          const data = [
-                            ...bookFavorite,
-                            {
-                              idBook: infoBook?.id,
-                              uid: firebase.auth().currentUser.uid,
-                              type: l,
-                            },
-                          ];
-                          dispatch(setFavoriteList(data));
-                          Alert.alert("Success", "successful evaluation");
-                        })
-                        .catch((error) => {
-                          Alert.alert("Success", error.message);
-                        });
-                    }
-                    setOpenSheet(false);
-                  }}
-                >
-                  <ListItem.Content>
-                    <ListItem.Title>
-                      <View style={styles.bottomSheet}>
-                        <Text>{l}</Text>
-                        {/* {i !== 3 && selectedOption === i ? (
-                          <Text>
-                            <Icon name="done" color="green" />
-                          </Text>
-                        ) : i === 3 ? (
-                          <Text>
-                            <Icon name="close" color="red" />
-                          </Text>
-                        ) : (
-                          <></>
-                        )} */}
-                      </View>
-                    </ListItem.Title>
-                  </ListItem.Content>
-                </ListItem>
-              ))}
+                    }}
+                  >
+                    <ListItem.Content>
+                      <ListItem.Title>
+                        <View style={styles.bottomSheet}>
+                          <Text>{l}</Text>
+                          {/* {i !== 3 && selectedOption === i ? (
+                                <Text>
+                                  <Icon name="done" color="green" />
+                                </Text>
+                              ) : i === 3 ? (
+                                <Text>
+                                  <Icon name="close" color="red" />
+                                </Text>
+                              ) : (
+                                <></>
+                              )} */}
+                        </View>
+                      </ListItem.Title>
+                    </ListItem.Content>
+                  </ListItem>
+                );
+              })}
             </BottomSheet>
           </View>
         </View>
