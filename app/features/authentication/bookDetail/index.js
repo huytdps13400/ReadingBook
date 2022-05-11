@@ -104,111 +104,12 @@ const BookDetail = ({ route }) => {
     Oswald_700Bold,
   });
   // console.log({ bookAll });
-  useEffect(() => {
-    // console.log(
-    //   "huy",
-    //   bookAll,
-    //   bookAll?.filter((v) => v.id === bookDetail?.id)[0]?.length > 0
-    // );
-    try {
-      const dataBook = bookAll?.filter((v) => v.id === bookDetail?.id)[0];
-      if (bookAll?.filter((v) => v.id === bookDetail?.id)[0]) {
-        setInfoBook(dataBook);
-      } else {
-        firebase.default
-          .database()
-          .ref("Book/" + bookDetail?.id)
-          .update(bookDetail)
-          .then(() => {
-            // Alert.alert(
-            //         "Success",
-            //         "Congratulations on your successful save",
-            //         [
-            //           {
-            //             text: "OK",
-            //             onPress: () =>
-            //               navigation.navigate(routesName.HOME_SCREEN),
-            //           },
-            //         ]
-            //       );
-          })
-          .catch((error) => {
-            console.log("hahaa", error);
-            console.error(error);
-          });
-        // firebase.default
-        //   .database()
-        //   .ref("BookUser/" + bookDetail?.id)
-        //   .update(
-        //     Object.assign(bookDetail, { uid: firebase.auth().currentUser.uid })
-        //   )
-        //   .then(() => {
-        //     // Alert.alert(
-        //     //         "Success",
-        //     //         "Congratulations on your successful save",
-        //     //         [
-        //     //           {
-        //     //             text: "OK",
-        //     //             onPress: () =>
-        //     //               navigation.navigate(routesName.HOME_SCREEN),
-        //     //           },
-        //     //         ]
-        //     //       );
-        //   })
-        //   .catch((error) => {
-        //     console.error(error);
-        //   });
-        setInfoBook(bookDetail);
-      }
-      // if (bookUser?.filter((v) => v.id === bookDetail?.id)[0]) {
-      // } else {
-      //   firebase.default
-      //     .database()
-      //     .ref("BookUser/" + bookDetail?.id)
-      //     .update(
-      //       Object.assign(bookDetail, { uid: firebase.auth().currentUser.uid })
-      //     )
-      //     .then(() => {
-      //       // Alert.alert(
-      //       //         "Success",
-      //       //         "Congratulations on your successful save",
-      //       //         [
-      //       //           {
-      //       //             text: "OK",
-      //       //             onPress: () =>
-      //       //               navigation.navigate(routesName.HOME_SCREEN),
-      //       //           },
-      //       //         ]
-      //       //       );
-      //     })
-      //     .catch((error) => {
-      //       console.error(error);
-      //     });
-      // }
-    } catch (error) {
-      console.log({ error });
-    }
-  }, [bookDetail?.id]);
+
   const showFullSynopsis = () => {
     setShowSynopsis((value) => !value);
     // console.log('message: ', bookMark)
   };
-  useEffect(() => {
-    if (infoBook?.id) {
-      dispatch(fetchUserById(infoBook?.id));
-      dispatch(fetchFavoriteUser(false));
-    }
-  }, [infoBook?.id, isFocused]);
-  useEffect(() => {
-    if (infoBook?.volumeInfo?.ratingsCount) {
-      dispatch(setRatingCount(infoBook?.volumeInfo?.ratingsCount));
-    }
-  }, [infoBook?.id, isFocused]);
-  console.log(
-    bookFavorite?.some((v) => v.idBook === infoBook?.id),
-    "kaka",
-    bookFavorite
-  );
+
   return (
     <View style={[styles.container, { paddingTop: inset.top }]}>
       <Header title="Book Details" />
@@ -234,69 +135,33 @@ const BookDetail = ({ route }) => {
                 <Image
                   style={styles.tinyLogo}
                   source={{
-                    uri: infoBook?.volumeInfo?.imageLinks?.smallThumbnail,
+                    uri: "https://cogaidiem.com/wp-content/plugins/penci-portfolio//images/no-thumbnail.jpg",
                   }}
                 />
               </View>
               <View style={styles.titleInfo}>
-                <Text style={styles.title}>{infoBook?.volumeInfo?.title}</Text>
-                <Text style={styles.author}>
-                  by {infoBook?.volumeInfo?.authors}
-                </Text>
-                {infoBook?.volumeInfo?.categories ? (
-                  <Text style={{ marginVertical: 10 }}>
-                    {infoBook?.volumeInfo?.categories
-                      ? infoBook?.volumeInfo?.categories[0]
-                      : ""}
-                  </Text>
-                ) : null}
+                <Text style={styles.title}>Title</Text>
+                <Text style={styles.author}>by authors</Text>
+                <Text style={{ marginVertical: 10 }}>categories</Text>
                 <View style={styles.rating}>
                   <Rating
                     type="star"
-                    startingValue={infoBook?.volumeInfo?.averageRating || 0}
+                    startingValue={0}
                     readonly
                     imageSize={30}
                     style={{ paddingVertical: 10 }}
                   />
                   <Text style={styles.ratingNumber}>
-                    {infoBook?.volumeInfo?.averageRating || 0} (
-                    {ratingCounts || 0} ratings)
+                    {0} ({0} ratings)
                   </Text>
                 </View>
                 <TouchableOpacity
                   onPress={() => {
-                    if (bookFavorite?.some((v) => v.idBook === infoBook?.id)) {
-                      // const id = bookFavorite?.filter(
-                      //   (v) => v.idBook === infoBook?.id
-                      // )[0]?.id;
-                      // firebase
-                      //   .database()
-                      //   .ref(`Favorite/${id}`)
-                      //   .remove()
-                      //   .then(() => {
-                      //     const dataFilter = bookFavorite?.filter(
-                      //       (v) => v.idBook !== infoBook?.id
-                      //     );
-                      //     setTimeout(() => {
-                      //       dispatch(setFavoriteList(dataFilter));
-                      //     }, 1000);
-                      //     Alert.alert("Success", "successful evaluation");
-                      //   })
-                      //   .catch((error) => {
-                      //     Alert.alert("Error", error.message);
-                      //   });
-                      setOpenSheet(true);
-                    } else {
-                      setOpenSheet(true);
-                    }
+                    setOpenSheet(true);
                   }}
                 >
                   <MaterialCommunityIcons
-                    name={
-                      bookFavorite?.some((v) => v.idBook === infoBook?.id)
-                        ? "heart"
-                        : "heart-outline"
-                    }
+                    name={"heart-outline"}
                     // name="heart-outline"
                     size={32}
                     color={"red"}
@@ -310,7 +175,7 @@ const BookDetail = ({ route }) => {
               <Text style={styles.synopsis}>Synopsis</Text>
               {!showSynopsis && (
                 <Text style={{ fontFamily: "Roboto_400Regular_Italic" }}>
-                  {infoBook?.volumeInfo?.description?.substring(0, 450)}...
+                  oakoasdsa...
                   <TouchableOpacity onPress={() => showFullSynopsis()}>
                     <Text style={styles.showMore}>Show more</Text>
                   </TouchableOpacity>
@@ -318,7 +183,7 @@ const BookDetail = ({ route }) => {
               )}
               {showSynopsis && (
                 <Text style={{ fontFamily: "Roboto_400Regular_Italic" }}>
-                  {infoBook?.volumeInfo?.description}
+                  abc
                   <TouchableOpacity onPress={() => showFullSynopsis()}>
                     <Text style={styles.showMore}>Show less</Text>
                   </TouchableOpacity>
@@ -327,97 +192,73 @@ const BookDetail = ({ route }) => {
             </View>
             <View style={styles.bottomContent}>
               <Text style={{ fontFamily: "Oswald_500Medium" }}>
-                <Text style={styles.bottom}>Published:</Text>{" "}
-                {infoBook?.volumeInfo?.publishedDate || 0}
+                <Text style={styles.bottom}>Published:</Text> {0}
               </Text>
               <Text style={{ fontFamily: "Oswald_500Medium" }}>
-                <Text style={styles.bottom}>Pages:</Text>{" "}
-                {infoBook?.volumeInfo?.pageCount || 0}
+                <Text style={styles.bottom}>Pages:</Text> {0}
               </Text>
             </View>
             <View style={{ height: 10 }} />
-            {reviewLists && reviewLists.length > 0 && (
-              <FlatList
-                data={reviewLists}
-                renderItem={({ item, index }) => {
-                  console.log({ item });
-                  return (
-                    <View
-                      style={{
-                        width: width - 40,
-                        marginLeft: 5,
-                        padding: 12,
-                        flexDirection: "row",
-                        marginVertical: 10,
-                        backgroundColor: "white",
-                        borderRadius: 8,
-                        shadowColor: "#000",
-                        shadowOffset: {
-                          width: 0,
-                          height: 2,
-                        },
-                        shadowOpacity: 0.25,
-                        shadowRadius: 3.84,
 
-                        elevation: 5,
+            <FlatList
+              data={[1, 2, 3, 4, 5]}
+              renderItem={({ item, index }) => {
+                console.log({ item });
+                return (
+                  <View
+                    style={{
+                      width: width - 40,
+                      marginLeft: 5,
+                      padding: 12,
+                      flexDirection: "row",
+                      marginVertical: 10,
+                      backgroundColor: "white",
+                      borderRadius: 8,
+                      shadowColor: "#000",
+                      shadowOffset: {
+                        width: 0,
+                        height: 2,
+                      },
+                      shadowOpacity: 0.25,
+                      shadowRadius: 3.84,
+
+                      elevation: 5,
+                    }}
+                  >
+                    <Image
+                      source={{
+                        uri: "https://cogaidiem.com/wp-content/plugins/penci-portfolio//images/no-thumbnail.jpg",
                       }}
-                    >
-                      <Image
-                        source={{ uri: item.imageAvatar }}
-                        style={{ height: 50, width: 50, borderRadius: 50 / 2 }}
+                      style={{ height: 50, width: 50, borderRadius: 50 / 2 }}
+                    />
+                    <View style={{ paddingLeft: 10 }}>
+                      <Text style={{ fontFamily: "Roboto_500Medium" }}>
+                        Tran Dinh Huy
+                      </Text>
+                      <Rating
+                        type="star"
+                        startingValue={0}
+                        readonly
+                        imageSize={15}
+                        style={{ paddingVertical: 10 }}
                       />
-                      <View style={{ paddingLeft: 10 }}>
-                        <Text style={{ fontFamily: "Roboto_500Medium" }}>
-                          {item.name}
-                        </Text>
-                        <Rating
-                          type="star"
-                          startingValue={item.rating || 0}
-                          readonly
-                          imageSize={15}
-                          style={{ paddingVertical: 10 }}
-                        />
-                        <Text style={{ fontFamily: "Roboto_500Medium" }}>
-                          {item.review}
-                        </Text>
-                      </View>
-                      {item.uid === firebase.auth().currentUser.uid && (
-                        <MaterialCommunityIcons
-                          name="window-close"
-                          size={24}
-                          color={"red"}
-                          style={{ position: "absolute", right: 10, top: 5 }}
-                          onPress={() => {
-                            firebase
-                              .database()
-                              .ref("Review/" + item.id)
-                              .remove()
-                              .then(() => {
-                                Alert.alert("Success", "successful evaluation");
-                                const arrayData = reviewLists?.filter(
-                                  (v) => v.id !== item.id
-                                );
-                                dispatch(setReviewList(arrayData));
-                                setTimeout(() => {
-                                  dispatch(
-                                    setRatingCount(
-                                      ratingCounts ? ratingCounts - 1 : 1
-                                    )
-                                  );
-                                }, 500);
-                              })
-                              .catch(() => {
-                                Alert.alert("Error", "error evaluation");
-                              });
-                          }}
-                        />
-                      )}
+                      <Text style={{ fontFamily: "Roboto_500Medium" }}>
+                        review
+                      </Text>
                     </View>
-                  );
-                }}
-                keyExtractor={(item, index) => index.toString()}
-              />
-            )}
+
+                    <MaterialCommunityIcons
+                      name="window-close"
+                      size={24}
+                      color={"red"}
+                      style={{ position: "absolute", right: 10, top: 5 }}
+                      onPress={() => {}}
+                    />
+                  </View>
+                );
+              }}
+              keyExtractor={(item, index) => index.toString()}
+            />
 
             <Rating
               type="star"
@@ -450,67 +291,7 @@ const BookDetail = ({ route }) => {
             />
             <Button
               title={"Submit"}
-              onPress={() => {
-                if (review && rating) {
-                  const key = firebase.database().ref("/Review").push().key;
-                  firebase
-                    .database()
-                    .ref("Review/" + key)
-                    .update({
-                      uid: firebase.auth().currentUser.uid,
-                      imageAvatar: firebase.auth().currentUser.photoURL,
-                      name: firebase.auth().currentUser.displayName,
-                      idBook: infoBook?.id,
-                      rating: Number(rating),
-                      review,
-                    })
-                    .then(() => {
-                      setRating(Number(0));
-                      const data = {
-                        uid: firebase.auth().currentUser.uid,
-                        imageAvatar: firebase.auth().currentUser.photoURL,
-                        name: firebase.auth().currentUser.displayName,
-                        idBook: infoBook?.id,
-                        rating: Number(rating),
-                        review,
-                      };
-                      const arrayData = [...reviewLists, data];
-                      // setReviewList((value) => [...value, data]);
-                      dispatch(setReviewList(arrayData));
-                      setReview("");
-                      setTimeout(() => {
-                        firebase
-                          .database()
-                          .ref("Book/" + infoBook?.id)
-                          .update({
-                            volumeInfo: {
-                              ...infoBook?.volumeInfo,
-                              ratingsCount: ratingCounts ? ratingCounts + 1 : 1,
-                            },
-                          })
-                          .then(() => {
-                            setTimeout(() => {
-                              dispatch(
-                                setRatingCount(
-                                  ratingCounts ? ratingCounts + 1 : 1
-                                )
-                              );
-                            }, 500);
-
-                            Alert.alert("Success", "successful evaluation");
-                          })
-                          .catch((error) => {
-                            Alert.alert("Success", error?.message);
-                          });
-                      }, 1000);
-                    })
-                    .catch(() => {
-                      Alert.alert("Error", "error evaluation");
-                    });
-                } else {
-                  Alert.alert("Error", "Please complete review with rating");
-                }
-              }}
+              onPress={() => {}}
               backgroundColor={theme.colors.blue}
             />
             <BottomSheet modalProps={{}} isVisible={openSheet}>
@@ -532,97 +313,6 @@ const BookDetail = ({ route }) => {
                     key={i}
                     // containerStyle={l.containerStyle}
                     onPress={() => {
-                      if (i !== 5) {
-                        setOpenSheet(false);
-                        if (i === 4) {
-                          if (
-                            bookFavorite?.some((v) => v.idBook === infoBook?.id)
-                          ) {
-                            const id = bookFavorite?.filter(
-                              (v) => v.idBook === infoBook?.id
-                            )[0]?.id;
-                            firebase
-                              .database()
-                              .ref(`Favorite/${id}`)
-                              .remove()
-                              .then(() => {
-                                const dataFilter = bookFavorite?.filter(
-                                  (v) => v.idBook !== infoBook?.id
-                                );
-                                setTimeout(() => {
-                                  dispatch(setFavoriteList(dataFilter));
-                                }, 1000);
-                                Alert.alert("Success", "successful evaluation");
-                              })
-                              .catch((error) => {
-                                Alert.alert("Error", error.message);
-                              });
-                          }
-                        } else {
-                          if (
-                            bookFavorite?.some((v) => v.idBook === infoBook?.id)
-                          ) {
-                            // const key = firebase
-                            // .database()
-                            // .ref("Favorite")
-                            // .push().key;
-                            const id = bookFavorite?.filter(
-                              (v) => v.idBook === infoBook?.id
-                            )[0]?.id;
-                            firebase
-                              .database()
-                              .ref("Favorite/" + id)
-                              .update({
-                                idBook: infoBook?.id,
-                                uid: firebase.auth().currentUser.uid,
-                                type: l,
-                              })
-                              .then(() => {
-                                // const data = [
-                                //   ...bookFavorite,
-                                //   {
-                                //     idBook: infoBook?.id,
-                                //     uid: firebase.auth().currentUser.uid,
-                                //     type: l,
-                                //   },
-                                // ];
-                                // dispatch(setFavoriteList(data));
-                                Alert.alert("Success", "successful evaluation");
-                              })
-                              .catch((error) => {
-                                Alert.alert("Success", error.message);
-                              });
-                          } else {
-                            const key = firebase
-                              .database()
-                              .ref("Favorite")
-                              .push().key;
-                            firebase
-                              .database()
-                              .ref("Favorite/" + key)
-                              .update({
-                                idBook: infoBook?.id,
-                                uid: firebase.auth().currentUser.uid,
-                                type: l,
-                              })
-                              .then(() => {
-                                const data = [
-                                  ...bookFavorite,
-                                  {
-                                    idBook: infoBook?.id,
-                                    uid: firebase.auth().currentUser.uid,
-                                    type: l,
-                                  },
-                                ];
-                                dispatch(setFavoriteList(data));
-                                Alert.alert("Success", "successful evaluation");
-                              })
-                              .catch((error) => {
-                                Alert.alert("Success", error.message);
-                              });
-                          }
-                        }
-                      }
                       setOpenSheet(false);
                     }}
                   >

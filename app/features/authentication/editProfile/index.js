@@ -27,7 +27,6 @@ const EditProfileScreen = ({ route }) => {
   const { profile } = route.params || {};
   const navigation = useNavigation();
   const isFocused = useIsFocused();
-  const uid = firebase.default.auth().currentUser.uid;
   const inset = useSafeAreaInsets();
   const [info, setInfo] = useState([]);
   const [username, setUserName] = useState(profile?.username);
@@ -52,121 +51,6 @@ const EditProfileScreen = ({ route }) => {
       setImage(`${result.uri}`);
     }
   };
-  async function uploadImageAsync(uri, checkId, key) {
-    const user = firebase.default.auth().currentUser;
-    let imageUrl = "";
-    if (uri) {
-      const blob = await new Promise((resolve, reject) => {
-        setIsLoadingImage(true);
-
-        const xhr = new XMLHttpRequest();
-        xhr.onload = function () {
-          resolve(xhr.response);
-        };
-        xhr.onerror = function (e) {
-          console.log(e);
-          reject(new TypeError("Network request failed"));
-        };
-        xhr.responseType = "blob";
-        xhr.open("GET", uri, true);
-        xhr.send(null);
-      });
-      const uid22 = uuid.v4();
-      const fileRef = firebase.default.storage().ref("Avatar/" + uid22);
-      const result = await firebase.default
-        .storage()
-        .ref("Avatar/" + uid22)
-        .put(blob)
-        .then(() => {
-          fileRef.getDownloadURL().then((url) => {
-            imageUrl = url;
-            if (url) {
-              user
-                .updateProfile({
-                  photoURL: imageUrl,
-                  displayName: username,
-                })
-                .then(() => {
-                  const data = {
-                    photoURL: imageUrl,
-                    address: address,
-                    email: profile?.email,
-                    username,
-                    phone,
-                    age,
-                  };
-                  firebase.default
-                    .database()
-                    .ref("User/" + uid)
-                    .update(data)
-                    .then(() => {
-                      Alert.alert(
-                        "Success",
-                        "Congratulations on your successful save",
-                        [
-                          {
-                            text: "OK",
-                            onPress: () =>
-                              navigation.navigate(routesName.PROFILE_SCREEN),
-                          },
-                        ]
-                      );
-                    })
-                    .catch((error) => {
-                      console.error(error);
-                    });
-                });
-              return;
-            }
-          });
-        });
-      blob.close();
-      setIsLoadingImage(false);
-      console.log({ imageUrl });
-    } else {
-      const data = {
-        address: address,
-        email: profile?.email,
-        username,
-        phone,
-        age,
-      };
-      console.log("data", data);
-      firebase.default
-        .database()
-        .ref("User/" + uid)
-        .update(data)
-        .then(() => {
-          Alert.alert("Success", "Congratulations on your successful save", [
-            {
-              text: "OK",
-              onPress: () => navigation.navigate(routesName.PROFILE_SCREEN),
-            },
-          ]);
-        })
-        .catch((error) => {
-          console.log(error, "kaka22");
-        });
-    }
-  }
-  useEffect(async () => {
-    const userRef = firebase.default.database().ref("/User");
-
-    const OnLoadingListener = userRef.on("value", (snapshot) => {
-      setInfo([]);
-      snapshot.forEach(function (childSnapshot) {
-        if (
-          firebase.default.auth().currentUser.uid === childSnapshot.val()?.uid
-        ) {
-          setInfo((users) => [...users, childSnapshot.val()]);
-        }
-      });
-    });
-    return () => {
-      userRef.off("value", OnLoadingListener);
-      firebase.default.auth().currentUser.uid = "";
-    };
-  }, [isFocused]);
 
   // console.log("info", info);
   return (
@@ -194,11 +78,7 @@ const EditProfileScreen = ({ route }) => {
               }}
               resizeMode="contain"
               source={{
-                uri: image
-                  ? image
-                  : firebase.default.auth()?.currentUser?.photoURL
-                  ? firebase.default.auth()?.currentUser.photoURL
-                  : "https://freesvg.org/img/myAvatar.png",
+                uri: "https://freesvg.org/img/myAvatar.png",
               }}
             />
           </TouchableOpacity>
@@ -257,9 +137,7 @@ const EditProfileScreen = ({ route }) => {
           <Button
             isLoading={isLoadingImage}
             title="Save"
-            onPress={() => {
-              uploadImageAsync(image, "", "");
-            }}
+            onPress={() => {}}
             backgroundColor={theme.colors.orange}
           />
         </View>

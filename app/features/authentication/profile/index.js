@@ -69,61 +69,7 @@ const ProfileScreen = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
-  const reviewListsUser = useSelector((state) => state.books.reviewListsUser);
-  const bookAll = useSelector((state) => state.books.bookmark);
 
-  useEffect(() => {
-    if (isFocused && bookAll) {
-      dispatch(fetchUserReview(bookAll));
-    }
-  }, [isFocused]);
-  console.log({ reviewListsUser });
-
-  useEffect(async () => {
-    const userRef = firebase.default.database().ref("/User");
-
-    const OnLoadingListener = userRef.on("value", (snapshot) => {
-      setInfo([]);
-      snapshot.forEach(function (childSnapshot) {
-        if (
-          firebase.default.auth()?.currentUser?.uid === childSnapshot.val()?.uid
-        ) {
-          setInfo((users) => [...users, childSnapshot.val()]);
-          console.log("alal", childSnapshot.val());
-        }
-      });
-    });
-    const reviewRef = firebase.default.database().ref("/Review");
-
-    const OnLoadingListeners = reviewRef.on("value", (snapshot) => {
-      snapshot.forEach(function (childSnapshot) {
-        if (
-          firebase.default.auth()?.currentUser?.uid === childSnapshot.val()?.uid
-        ) {
-          firebase
-            .database()
-            .ref("Review/" + childSnapshot.key)
-            .update({
-              imageAvatar: firebase.auth().currentUser?.photoURL,
-              name: firebase.auth().currentUser?.displayName,
-            })
-            .then(() => {})
-            .catch((error) => {
-              console.log(error);
-            });
-        }
-      });
-    });
-    return () => {
-      userRef.off("value", OnLoadingListener);
-      reviewRef.off("value", OnLoadingListeners);
-    };
-  }, [isFocused]);
-  useEffect(() => {
-    if (!isFocused) return;
-  }, [isFocused]);
-
-  console.log("info", info);
   const _renderItemBook = (item, index) => {
     return (
       <View
@@ -145,25 +91,18 @@ const ProfileScreen = () => {
           flexDirection: "row",
         }}
       >
-        {item.volumeInfo?.imageLinks?.thumbnail && (
-          <Image
-            resizeMode="cover"
-            style={{
-              width: (width - 32) * 0.5,
-              height: 150,
-              borderTopLeftRadius: 8,
-              borderBottomLeftRadius: 8,
-            }}
-            source={{
-              uri:
-                item.volumeInfo?.imageLinks?.thumbnail.replace(
-                  "zoom=1",
-                  "zoom=1"
-                ) ||
-                "https://cogaidiem.com/wp-content/plugins/penci-portfolio//images/no-thumbnail.jpg",
-            }}
-          />
-        )}
+        <Image
+          resizeMode="cover"
+          style={{
+            width: (width - 32) * 0.5,
+            height: 150,
+            borderTopLeftRadius: 8,
+            borderBottomLeftRadius: 8,
+          }}
+          source={{
+            uri: "https://cogaidiem.com/wp-content/plugins/penci-portfolio//images/no-thumbnail.jpg",
+          }}
+        />
 
         <View style={{ width: (width - 32) * 0.5, paddingLeft: 4 }}>
           <Text
@@ -178,21 +117,16 @@ const ProfileScreen = () => {
           >
             {item?.volumeInfo?.title}
           </Text>
-          {typeof item?.volumeInfo?.authors !== "undefined" &&
-            item?.volumeInfo?.authors.map((item, index) => {
-              return (
-                <Text
-                  style={{
-                    fontSize: 16,
-                    marginBottom: 10,
-                    fontFamily: "Oswald_500Medium",
-                  }}
-                  key={index}
-                >
-                  by {item}
-                </Text>
-              );
-            })}
+          <Text
+            style={{
+              fontSize: 16,
+              marginBottom: 10,
+              fontFamily: "Oswald_500Medium",
+            }}
+            key={index}
+          >
+            by admin
+          </Text>
           <View
             style={{
               flexDirection: "row",
@@ -208,7 +142,7 @@ const ProfileScreen = () => {
                 fontFamily: "Oswald_300Light",
               }}
             >
-              Page: {item.volumeInfo.pageCount || 0}
+              Page: {0}
             </Text>
             <Text
               style={{
@@ -218,7 +152,7 @@ const ProfileScreen = () => {
                 fontFamily: "Oswald_300Light",
               }}
             >
-              Rating: {item.volumeInfo.averageRating || 0}
+              Rating: {0}
             </Text>
           </View>
 
@@ -264,9 +198,7 @@ const ProfileScreen = () => {
                   borderRadius: 90 / 2,
                 }}
                 source={{
-                  uri: firebase.default.auth()?.currentUser?.photoURL
-                    ? firebase.default.auth()?.currentUser?.photoURL
-                    : "https://freesvg.org/img/myAvatar.png",
+                  uri: "https://freesvg.org/img/myAvatar.png",
                 }}
               />
               <View
@@ -283,22 +215,20 @@ const ProfileScreen = () => {
                     fontFamily: "Oswald_700Bold",
                   }}
                 >
-                  {info[0]?.username}
+                  Admin
                 </Text>
                 <View style={{ height: 5 }} />
                 <Text style={{ fontFamily: "Oswald_500Medium" }}>
-                  {info[0]?.email}
+                  admin@gmail.com
                 </Text>
                 <View style={{ height: 5 }} />
                 <Text style={{ fontFamily: "Oswald_500Medium" }}>
-                  {info[0]?.phone}
+                  0356160325
                 </Text>
               </View>
               <TouchableOpacity
                 onPress={() =>
-                  navigation.navigate(routesName.EDIT_PROFILE_SCREEN, {
-                    profile: info[0],
-                  })
+                  navigation.navigate(routesName.EDIT_PROFILE_SCREEN)
                 }
               >
                 <Icons name="create-outline" size={24} />
@@ -315,14 +245,12 @@ const ProfileScreen = () => {
               <Button
                 title={"LogOut"}
                 backgroundColor={theme.colors.orange}
-                onPress={() => {
-                  firebase.default.auth().signOut();
-                }}
+                onPress={() => {}}
               />
               <Text style={{ fontFamily: "Oswald_700Bold", fontSize: 20 }}>
                 List Review
               </Text>
-              {<View>{reviewListsUser.map(_renderItemBook)}</View>}
+              {<View>{[1, 2, 3, 4, 5, 6].map(_renderItemBook)}</View>}
             </View>
           </>
         )}

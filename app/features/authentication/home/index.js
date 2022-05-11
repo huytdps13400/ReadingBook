@@ -133,19 +133,19 @@ const HomeScreen = () => {
     });
   }, [isFocused, keyword]);
 
-  useEffect(() => {
-    const BookRef = firebase.default.database().ref("/Book");
-    const data = [];
-    const OnLoadingListener = BookRef.once("value", (snapshot) => {
-      snapshot.forEach(function (childSnapshot) {
-        if (!childSnapshot) return;
-        data.push(childSnapshot.val());
-      });
-      dispatch(setBook(data));
-    });
-    dispatch(fetchBookUser(null));
-    return () => {};
-  }, [isFocused]);
+  // useEffect(() => {
+  //   const BookRef = firebase.default.database().ref("/Book");
+  //   const data = [];
+  //   const OnLoadingListener = BookRef.once("value", (snapshot) => {
+  //     snapshot.forEach(function (childSnapshot) {
+  //       if (!childSnapshot) return;
+  //       data.push(childSnapshot.val());
+  //     });
+  //     dispatch(setBook(data));
+  //   });
+  //   dispatch(fetchBookUser(null));
+  //   return () => {};
+  // }, [isFocused]);
   const _renderItem = ({ item, index }) => {
     return (
       <ImageBackground
@@ -329,8 +329,6 @@ const HomeScreen = () => {
     );
   };
 
-  console.log("lala", firebase.auth().currentUser?.photoURL);
-
   const handleKeyword = React.useCallback((text) => {
     setKeyword(text);
   }, []);
@@ -369,7 +367,9 @@ const HomeScreen = () => {
                       borderRadius: 20,
                       borderWidth: 0.5,
                     }}
-                    source={{ uri: firebase.auth().currentUser?.photoURL }}
+                    source={{
+                      uri: "https://cogaidiem.com/wp-content/plugins/penci-portfolio//images/no-thumbnail.jpg",
+                    }}
                   />
                 </View>
 

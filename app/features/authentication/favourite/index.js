@@ -74,12 +74,6 @@ const FavoriteScreen = () => {
   const bookFavorite = useSelector((state) => state.books.bookFavorite);
   const bookUser = useSelector((state) => state.books.bookUser);
 
-  useEffect(() => {
-    if (isFocused) {
-      dispatch(fetchFavoriteUser(type));
-    }
-  }, [type, isFocused]);
-
   const renderItemTab = (item, index) => {
     return (
       <TouchableOpacity
@@ -140,25 +134,18 @@ const FavoriteScreen = () => {
           flexDirection: "row",
         }}
       >
-        {item.volumeInfo?.imageLinks?.thumbnail && (
-          <Image
-            resizeMode="cover"
-            style={{
-              width: (width - 32) * 0.5,
-              height: 150,
-              borderTopLeftRadius: 8,
-              borderBottomLeftRadius: 8,
-            }}
-            source={{
-              uri:
-                item.volumeInfo?.imageLinks?.thumbnail.replace(
-                  "zoom=1",
-                  "zoom=1"
-                ) ||
-                "https://cogaidiem.com/wp-content/plugins/penci-portfolio//images/no-thumbnail.jpg",
-            }}
-          />
-        )}
+        <Image
+          resizeMode="cover"
+          style={{
+            width: (width - 32) * 0.5,
+            height: 150,
+            borderTopLeftRadius: 8,
+            borderBottomLeftRadius: 8,
+          }}
+          source={{
+            uri: "https://cogaidiem.com/wp-content/plugins/penci-portfolio//images/no-thumbnail.jpg",
+          }}
+        />
 
         <View style={{ width: (width - 32) * 0.5, paddingLeft: 4 }}>
           <Text
@@ -171,23 +158,18 @@ const FavoriteScreen = () => {
             }}
             numberOfLines={3}
           >
-            {item?.volumeInfo?.title}
+            title
           </Text>
-          {typeof item?.volumeInfo?.authors !== "undefined" &&
-            item?.volumeInfo?.authors.map((item, index) => {
-              return (
-                <Text
-                  style={{
-                    fontSize: 16,
-                    marginBottom: 10,
-                    fontFamily: "Oswald_500Medium",
-                  }}
-                  key={index}
-                >
-                  by {item}
-                </Text>
-              );
-            })}
+          <Text
+            style={{
+              fontSize: 16,
+              marginBottom: 10,
+              fontFamily: "Oswald_500Medium",
+            }}
+            key={index}
+          >
+            by
+          </Text>
           <View
             style={{
               flexDirection: "row",
@@ -203,7 +185,7 @@ const FavoriteScreen = () => {
                 fontFamily: "Oswald_300Light",
               }}
             >
-              Page: {item?.volumeInfo?.pageCount || 0}
+              Page: {0}
             </Text>
             <Text
               style={{
@@ -213,7 +195,7 @@ const FavoriteScreen = () => {
                 fontFamily: "Oswald_300Light",
               }}
             >
-              Rating: {item?.volumeInfo?.averageRating || 0}
+              Rating: {0}
             </Text>
           </View>
 
@@ -246,7 +228,7 @@ const FavoriteScreen = () => {
       </View>
     );
   };
-  console.log({ bookFavorite });
+
   return (
     <View style={[styles.container, { paddingTop: inset.top }]}>
       {fontsLoaded && (
@@ -257,7 +239,7 @@ const FavoriteScreen = () => {
           <FlatList
             style={{ flex: 1 }}
             showsVerticalScrollIndicator={false}
-            data={bookFavorite}
+            data={[1, 2, 3, 4]}
             renderItem={_renderItemBook}
             keyExtractor={(item, index) => index.toString()}
           />
