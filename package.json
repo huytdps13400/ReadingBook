@@ -20,12 +20,10 @@
     "@react-navigation/native": "^6.0.10",
     "@react-navigation/native-stack": "^6.6.1",
     "@react-navigation/stack": "^6.2.1",
-    "@reduxjs/toolkit": "^1.7.2",
     "expo": "~44.0.0",
     "expo-font": "~10.0.4",
     "expo-image-picker": "~12.0.1",
     "expo-status-bar": "~1.2.0",
-    "firebase": "^8.1.0",
     "moment": "^2.29.1",
     "react": "17.0.1",
     "react-dom": "17.0.1",
@@ -41,8 +39,6 @@
     "react-native-svg": "12.1.1",
     "react-native-uuid": "^2.0.1",
     "react-native-web": "0.17.1",
-    "react-redux": "^7.2.6",
-    "redux-thunk": "^2.4.1",
     "yup": "^0.32.11"
   },
   "devDependencies": {

@@ -1,32 +1,12 @@
 import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  Linking,
-  FlatList,
-  ImageBackground,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
-import React, { useEffect, useState } from "react";
-import { theme } from "../../../theme";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Carousel from "react-native-snap-carousel";
-import { firebase } from "../../../../config/firebaseconfig";
-import { useNavigation, useIsFocused } from "@react-navigation/native";
-import { routesName } from "../../../navigation/routes";
-import TextInputForm from "../../../components/TextInputForm";
-export const API_BOOKS_KEY = "AIzaSyB-OtACxBjF7rAudHEmIH_vT_CAu2d6p5U";
-export const GOOGLE_BOOKS_URL = "https://www.googleapis.com/books";
-export const KEY_HEADER = " :keyes&key=" + API_BOOKS_KEY;
-export const ALL_EBOOKS_ENDPOInT = "/v1/volumes?q=";
-export const FREE_BOOKS_ENPOINT = "/v1/volumes?q=flowers&filter=free-ebooks";
-import { useDispatch } from "react-redux";
-import { fetchBookUser, setBook } from "../../../Redux/reduxSlice";
+  Oswald_200ExtraLight,
+  Oswald_300Light,
+  Oswald_400Regular,
+  Oswald_500Medium,
+  Oswald_600SemiBold,
+  Oswald_700Bold,
+} from "@expo-google-fonts/oswald";
 import {
-  useFonts,
   Roboto_100Thin,
   Roboto_100Thin_Italic,
   Roboto_300Light,
@@ -35,19 +15,33 @@ import {
   Roboto_400Regular_Italic,
   Roboto_500Medium,
   Roboto_500Medium_Italic,
-  Roboto_700Bold,
   Roboto_700Bold_Italic,
   Roboto_900Black,
-  Roboto_900Black_Italic,
+  useFonts,
 } from "@expo-google-fonts/roboto";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
 import {
-  Oswald_200ExtraLight,
-  Oswald_300Light,
-  Oswald_400Regular,
-  Oswald_500Medium,
-  Oswald_600SemiBold,
-  Oswald_700Bold,
-} from "@expo-google-fonts/oswald";
+  Dimensions,
+  FlatList,
+  Image,
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Carousel from "react-native-snap-carousel";
+import TextInputForm from "../../../components/TextInputForm";
+import { routesName } from "../../../navigation/routes";
+import { theme } from "../../../theme";
+export const API_BOOKS_KEY = "AIzaSyB-OtACxBjF7rAudHEmIH_vT_CAu2d6p5U";
+export const GOOGLE_BOOKS_URL = "https://www.googleapis.com/books";
+export const KEY_HEADER = " :keyes&key=" + API_BOOKS_KEY;
+export const ALL_EBOOKS_ENDPOInT = "/v1/volumes?q=";
+export const FREE_BOOKS_ENPOINT = "/v1/volumes?q=flowers&filter=free-ebooks";
 
 export async function getData(url, endpoint) {
   try {
@@ -88,7 +82,6 @@ const HomeScreen = () => {
   const isFocused = useIsFocused();
   const [DataBook, setDataBook] = useState([]);
   const [keyword, setKeyword] = useState("");
-  const dispatch = useDispatch();
   let [fontsLoaded] = useFonts({
     Roboto_100Thin,
     Roboto_100Thin_Italic,
@@ -109,43 +102,13 @@ const HomeScreen = () => {
     Oswald_600SemiBold,
     Oswald_700Bold,
   });
-  // useEffect(async () => {
-  //   const userRef = firebase.default.database().ref('/Book');
 
-  //   const OnLoadingListener = userRef.on('value', (snapshot) => {
-  //     setDataBook([]);
-  //     snapshot.forEach(function (childSnapshot) {
-  //       if(firebase.default.auth()?.currentUser?.uid === childSnapshot.val()?.uid){
-  //         setDataBook((users) => [...users, childSnapshot.val()]);
-  //         console.log('alal',childSnapshot.val())
-  //       }
-
-  //     });
-  //   });
-  //   return () => {
-  //     userRef.off('value', OnLoadingListener);
-
-  //   };
-  // }, [isFocused]);
   useEffect(async () => {
     await getAllEbooks(keyword).then((res) => {
       setDataBook(res.items);
     });
   }, [isFocused, keyword]);
 
-  // useEffect(() => {
-  //   const BookRef = firebase.default.database().ref("/Book");
-  //   const data = [];
-  //   const OnLoadingListener = BookRef.once("value", (snapshot) => {
-  //     snapshot.forEach(function (childSnapshot) {
-  //       if (!childSnapshot) return;
-  //       data.push(childSnapshot.val());
-  //     });
-  //     dispatch(setBook(data));
-  //   });
-  //   dispatch(fetchBookUser(null));
-  //   return () => {};
-  // }, [isFocused]);
   const _renderItem = ({ item, index }) => {
     return (
       <ImageBackground

@@ -1,28 +1,16 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  Keyboard,
-  Alert
-} from "react-native";
-import React, { useState } from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { theme } from "../../../theme";
-import TextInputForm from "../../../components/TextInputForm";
-import Button from "../../../components/Button";
-import FormContainer from "../../../components/FormContainer";
-import { useNavigation } from "@react-navigation/native";
-import { routesName } from "../../../navigation/routes";
-import { Controller, useForm } from "react-hook-form";
-
 // sử dụng thư viện react-hook-form để bắt lỗi cho form
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { Image, Keyboard, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Button from "../../../components/Button";
+import FormContainer from "../../../components/FormContainer";
+import TextInputForm from "../../../components/TextInputForm";
+import { routesName } from "../../../navigation/routes";
+import { theme } from "../../../theme";
 import { loginSchema } from "./loginValidation";
-import {firebase} from "../../../../config/firebaseconfig";
-// import { signInWithEmailAndPassword } from "firebase/auth";
-//thư viện yup lấy được từ hookform
 
 const LoginScreen = () => {
   const inset = useSafeAreaInsets();
@@ -42,37 +30,11 @@ const LoginScreen = () => {
   });
   const onSubmit = handleSubmit(({ email, password }) => {
     Keyboard.dismiss();
-    setIsLoadingLogin(true);
-  firebase.default.auth().signInWithEmailAndPassword( email, password)
-      .then(() => {
-        setIsLoadingLogin(false);
-        // setTimeout(() => {
-        //   navigation.navigate(routesName.BOTTOM_BAR);
-        // }, 500);
-      })
-      .catch((error) => {
-        setIsLoadingLogin(false);
-        const { message} = error;
-
-        Alert.alert(
-          "Error",
-          message,
-          [
-            {
-              text: "OK",
-              style:'cancel',
-             
-            },
-          ]
-        );
-        console.log(error);
-      });
+    navigation.navigate(routesName.BOTTOM_BAR);
   });
 
-  // đây là thư viện để độ cao độ thấp của màn hình so với statusbar
   return (
     <View style={[styles.container, { paddingTop: inset.top }]}>
-      {/* // FormContainer là keyboardAvoiding bao cả view */}
       <FormContainer>
         <View style={styles.boxLogo}>
           <Image
@@ -87,8 +49,6 @@ const LoginScreen = () => {
         <Text style={styles.textWelcome}>Welcome</Text>
         <Text style={styles.textLet}>Let's get started!</Text>
         <View>
-          {/* Viết một input để sài cho nhiều lần */}
-          {/* sử dụng Controller của react hook form để xử lí lấy được value và bắt lỗi  */}
           <Controller
             name="email"
             control={control}
@@ -135,7 +95,6 @@ const LoginScreen = () => {
             )}
           />
 
-          {/* Button cũng vậy viết 1 lần sử dụng nhiều lần  */}
           <Button
             disabled={isLoadingLogin}
             backgroundColor={theme.colors.orange}

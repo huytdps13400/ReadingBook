@@ -1,23 +1,12 @@
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  FlatList,
-  Dimensions,
-  ScrollView,
-} from "react-native";
-import React, { useState, useEffect } from "react";
-import { theme } from "../../../theme";
-import Button from "../../../components/Button";
-import { firebase } from "../../../../config/firebaseconfig";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation, useIsFocused } from "@react-navigation/native";
-import Icons from "@expo/vector-icons/Ionicons";
-import { routesName } from "../../../navigation/routes";
+  Oswald_200ExtraLight,
+  Oswald_300Light,
+  Oswald_400Regular,
+  Oswald_500Medium,
+  Oswald_600SemiBold,
+  Oswald_700Bold,
+} from "@expo-google-fonts/oswald";
 import {
-  useFonts,
   Roboto_100Thin,
   Roboto_100Thin_Italic,
   Roboto_300Light,
@@ -26,21 +15,26 @@ import {
   Roboto_400Regular_Italic,
   Roboto_500Medium,
   Roboto_500Medium_Italic,
-  Roboto_700Bold,
   Roboto_700Bold_Italic,
   Roboto_900Black,
-  Roboto_900Black_Italic,
+  useFonts,
 } from "@expo-google-fonts/roboto";
+import Icons from "@expo/vector-icons/Ionicons";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
 import {
-  Oswald_200ExtraLight,
-  Oswald_300Light,
-  Oswald_400Regular,
-  Oswald_500Medium,
-  Oswald_600SemiBold,
-  Oswald_700Bold,
-} from "@expo-google-fonts/oswald";
-import { fetchUserReview, setRatingCount } from "../../../Redux/reduxSlice";
-import { useSelector, useDispatch } from "react-redux";
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Button from "../../../components/Button";
+import { routesName } from "../../../navigation/routes";
+import { theme } from "../../../theme";
 const { width } = Dimensions.get("window");
 
 const ProfileScreen = () => {
@@ -68,7 +62,6 @@ const ProfileScreen = () => {
   });
   const navigation = useNavigation();
   const isFocused = useIsFocused();
-  const dispatch = useDispatch();
 
   const _renderItemBook = (item, index) => {
     return (

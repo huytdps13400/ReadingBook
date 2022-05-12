@@ -1,18 +1,16 @@
-import { View, Text, StyleSheet, Image, Keyboard, Alert } from "react-native";
-import React, { useState } from "react";
-import FormContainer from "../../../components/FormContainer";
-import TextInputForm from "../../../components/TextInputForm";
-import Button from "../../../components/Button";
-import { theme } from "../../../theme";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
-import { routesName } from "../../../navigation/routes";
-import { Controller, useForm } from "react-hook-form";
-
 // sử dụng thư viện react-hook-form để bắt lỗi cho form
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { Image, Keyboard, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Button from "../../../components/Button";
+import FormContainer from "../../../components/FormContainer";
+import TextInputForm from "../../../components/TextInputForm";
+import { routesName } from "../../../navigation/routes";
+import { theme } from "../../../theme";
 import { signupSchema } from "./signupValidation";
-import { firebase } from "../../../../config/firebaseconfig";
 
 const SignUpScreen = () => {
   const inset = useSafeAreaInsets();
@@ -39,45 +37,7 @@ const SignUpScreen = () => {
   const onSubmit = handleSubmit(
     ({ email, password, address, phone, username, age }) => {
       Keyboard.dismiss();
-      setIsLoadingSignUp(true);
-      firebase.default
-        .auth()
-        .createUserWithEmailAndPassword(email, password)
-        .then(() => {
-          const uid = firebase.default.auth().currentUser.uid;
-          const reference = firebase.default.database().ref("User/" + uid);
-
-          firebase.default
-            .database()
-            .ref(reference)
-            .update({ username, address, phone, email, age, uid: uid })
-            .then(() => {
-              setIsLoadingSignUp(false);
-              firebase.auth().currentUser.updateProfile({
-                displayName: username,
-                photoURL: "https://freesvg.org/img/myAvatar.png",
-              });
-            })
-            .catch((error) => {
-              console.log({ error });
-            });
-
-          // setTimeout(() => {
-          //   navigation.navigate(routesName.LOGIN_SCREEN);
-          // }, 500);
-        })
-        .catch((error) => {
-          const { message } = error;
-          Alert.alert("Error", message, [
-            {
-              text: "OK",
-              style: "cancel",
-            },
-          ]);
-          setIsLoadingSignUp(false);
-
-          console.log(error);
-        });
+      navigation.navigate(routesName.LOGIN_SCREEN);
     }
   );
   return (

@@ -1,24 +1,3 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, LogBox } from "react-native";
-import RootStack from "./app/navigation/rootStack";
-import { store } from "./app/Redux/store";
-import { Provider } from "react-redux";
-import React, { useEffect } from "react";
-import {
-  useFonts,
-  Roboto_100Thin,
-  Roboto_100Thin_Italic,
-  Roboto_300Light,
-  Roboto_300Light_Italic,
-  Roboto_400Regular,
-  Roboto_400Regular_Italic,
-  Roboto_500Medium,
-  Roboto_500Medium_Italic,
-  Roboto_700Bold,
-  Roboto_700Bold_Italic,
-  Roboto_900Black,
-  Roboto_900Black_Italic,
-} from "@expo-google-fonts/roboto";
 import {
   Oswald_200ExtraLight,
   Oswald_300Light,
@@ -27,6 +6,23 @@ import {
   Oswald_600SemiBold,
   Oswald_700Bold,
 } from "@expo-google-fonts/oswald";
+import {
+  Roboto_100Thin,
+  Roboto_100Thin_Italic,
+  Roboto_300Light,
+  Roboto_300Light_Italic,
+  Roboto_400Regular,
+  Roboto_400Regular_Italic,
+  Roboto_500Medium,
+  Roboto_500Medium_Italic,
+  Roboto_700Bold_Italic,
+  Roboto_900Black,
+  useFonts,
+} from "@expo-google-fonts/roboto";
+import { StatusBar } from "expo-status-bar";
+import React from "react";
+import { LogBox, StyleSheet } from "react-native";
+import RootStack from "./app/navigation/rootStack";
 
 LogBox.ignoreAllLogs();
 console.ignoredYellowBox = ["Setting a timer"];
@@ -52,10 +48,10 @@ const App = () => {
     Oswald_700Bold,
   });
   return (
-    <Provider store={store}>
+    <>
       <StatusBar style="dark" />
       {fontsLoaded ? <RootStack /> : null}
-    </Provider>
+    </>
   );
 };
 export default App;

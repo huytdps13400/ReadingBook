@@ -1,33 +1,4 @@
 import {
-  View,
-  Text,
-  Dimensions,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-  Image,
-} from "react-native";
-import React, { useState, useEffect } from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { theme } from "../../../theme";
-import { useNavigation, useIsFocused } from "@react-navigation/native";
-import { routesName } from "../../../navigation/routes";
-import {
-  useFonts,
-  Roboto_100Thin,
-  Roboto_100Thin_Italic,
-  Roboto_300Light,
-  Roboto_300Light_Italic,
-  Roboto_400Regular,
-  Roboto_400Regular_Italic,
-  Roboto_500Medium,
-  Roboto_500Medium_Italic,
-  Roboto_700Bold,
-  Roboto_700Bold_Italic,
-  Roboto_900Black,
-  Roboto_900Black_Italic,
-} from "@expo-google-fonts/roboto";
-import {
   Oswald_200ExtraLight,
   Oswald_300Light,
   Oswald_400Regular,
@@ -36,11 +7,32 @@ import {
   Oswald_700Bold,
 } from "@expo-google-fonts/oswald";
 import {
-  fetchUserById,
-  fetchFavoriteUser,
-  fetchBookUser,
-} from "../../../Redux/reduxSlice";
-import { useSelector, useDispatch } from "react-redux";
+  Roboto_100Thin,
+  Roboto_100Thin_Italic,
+  Roboto_300Light,
+  Roboto_300Light_Italic,
+  Roboto_400Regular,
+  Roboto_400Regular_Italic,
+  Roboto_500Medium,
+  Roboto_500Medium_Italic,
+  Roboto_700Bold_Italic,
+  Roboto_900Black,
+  useFonts,
+} from "@expo-google-fonts/roboto";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { routesName } from "../../../navigation/routes";
+import { theme } from "../../../theme";
 
 const { width } = Dimensions.get("window");
 let bookOptions = ["Want to Read", "Start Reading", "Read", "Favorite Book"];
@@ -70,9 +62,6 @@ const FavoriteScreen = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const [type, setType] = useState("Want to Read");
-  const dispatch = useDispatch();
-  const bookFavorite = useSelector((state) => state.books.bookFavorite);
-  const bookUser = useSelector((state) => state.books.bookUser);
 
   const renderItemTab = (item, index) => {
     return (

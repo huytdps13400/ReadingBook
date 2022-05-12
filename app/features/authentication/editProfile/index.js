@@ -1,25 +1,19 @@
+import { useIsFocused, useNavigation } from "@react-navigation/core";
+import * as ImagePicker from "expo-image-picker";
+import React, { useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Image,
-  TouchableOpacity,
   Dimensions,
-  Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import { theme } from "../../../theme";
-import Button from "../../../components/Button";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Icons from "@expo/vector-icons/Ionicons";
+import Button from "../../../components/Button";
 import Header from "../../../components/Header";
 import TextInputForm from "../../../components/TextInputForm";
-import { routesName } from "../../../navigation/routes";
-import { useNavigation, useIsFocused } from "@react-navigation/core";
-import { firebase } from "../../../../config/firebaseconfig";
-import * as ImagePicker from "expo-image-picker";
-import uuid from "react-native-uuid";
+import { theme } from "../../../theme";
 
 const { width } = Dimensions.get("window");
 

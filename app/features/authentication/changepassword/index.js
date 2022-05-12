@@ -1,15 +1,14 @@
-import { View, Text, StyleSheet, Keyboard, Alert } from "react-native";
-import React, { useState } from "react";
-import { theme } from "../../../theme";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { changepasswordSchema } from "./changepasswordValidation";
-import TextInputForm from "../../../components/TextInputForm";
-import Header from "../../../components/Header";
-import Button from "../../../components/Button";
 import { useNavigation } from "@react-navigation/native";
-import { firebase } from "../../../../config/firebaseconfig";
+import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { Keyboard, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Button from "../../../components/Button";
+import Header from "../../../components/Header";
+import TextInputForm from "../../../components/TextInputForm";
+import { theme } from "../../../theme";
+import { changepasswordSchema } from "./changepasswordValidation";
 
 const ChangePasswordScreen = () => {
   const inset = useSafeAreaInsets();

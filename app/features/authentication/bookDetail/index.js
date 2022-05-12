@@ -1,32 +1,12 @@
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  Dimensions,
-  ScrollView,
-  Alert,
-  FlatList,
-} from "react-native";
-import React, { useEffect, useState } from "react";
-import { firebase } from "../../../../config/firebaseconfig";
-import Header from "../../../components/Header";
-import TextInputForm from "../../../components/TextInputForm";
-import Button from "../../../components/Button";
-import { theme } from "../../../theme";
-import { useNavigation, useIsFocused } from "@react-navigation/core";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useSelector } from "react-redux";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Rating, BottomSheet, ListItem } from "react-native-elements";
+  Oswald_200ExtraLight,
+  Oswald_300Light,
+  Oswald_400Regular,
+  Oswald_500Medium,
+  Oswald_600SemiBold,
+  Oswald_700Bold,
+} from "@expo-google-fonts/oswald";
 import {
-  fetchFavoriteUser,
-  setFavoriteList,
-  setReviewList,
-} from "../../../Redux/reduxSlice";
-import {
-  useFonts,
   Roboto_100Thin,
   Roboto_100Thin_Italic,
   Roboto_300Light,
@@ -35,21 +15,29 @@ import {
   Roboto_400Regular_Italic,
   Roboto_500Medium,
   Roboto_500Medium_Italic,
-  Roboto_700Bold,
   Roboto_700Bold_Italic,
   Roboto_900Black,
-  Roboto_900Black_Italic,
+  useFonts,
 } from "@expo-google-fonts/roboto";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useIsFocused, useNavigation } from "@react-navigation/core";
+import React, { useState } from "react";
 import {
-  Oswald_200ExtraLight,
-  Oswald_300Light,
-  Oswald_400Regular,
-  Oswald_500Medium,
-  Oswald_600SemiBold,
-  Oswald_700Bold,
-} from "@expo-google-fonts/oswald";
-import { useDispatch } from "react-redux";
-import { fetchUserById, setRatingCount } from "../../../Redux/reduxSlice";
+  Dimensions,
+  FlatList,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { BottomSheet, ListItem, Rating } from "react-native-elements";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Button from "../../../components/Button";
+import Header from "../../../components/Header";
+import TextInputForm from "../../../components/TextInputForm";
+import { theme } from "../../../theme";
 let bookOptions = [
   "Want to Read",
   "Start Reading",
@@ -65,20 +53,12 @@ const BookDetail = ({ route }) => {
   const navigation = useNavigation();
   const inset = useSafeAreaInsets();
   const [showSynopsis, setShowSynopsis] = useState(false);
-  const dispatch = useDispatch();
   const [openSheet, setOpenSheet] = useState(false);
 
   const isFocused = useIsFocused();
   const { item: bookDetail } = route.params || {};
   const [infoBook, setInfoBook] = useState({});
   // const [reviewList, setReviewList] = useState([]);
-
-  const bookAll = useSelector((state) => state.books.bookmark);
-  const bookUser = useSelector((state) => state.books.bookUser);
-
-  const reviewLists = useSelector((state) => state.books.reviewLists);
-  const ratingCounts = useSelector((state) => state.books.ratingCount);
-  const bookFavorite = useSelector((state) => state.books.bookFavorite);
 
   const [review, setReview] = useState("");
   const [rating, setRating] = useState(0);
@@ -296,18 +276,6 @@ const BookDetail = ({ route }) => {
             />
             <BottomSheet modalProps={{}} isVisible={openSheet}>
               {bookOptions.map((l, i) => {
-                if (
-                  bookFavorite?.filter((v) => v.idBook === infoBook?.id)[0]
-                    ?.type === l
-                ) {
-                  return null;
-                }
-                if (
-                  !bookFavorite?.some((v) => v.idBook === infoBook?.id) &&
-                  l === "Cancel Favorite Book"
-                ) {
-                  return null;
-                }
                 return (
                   <ListItem
                     key={i}
