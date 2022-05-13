@@ -62,19 +62,7 @@ export const getFreeEBooks = async () => {
   const endpoint = FREE_BOOKS_ENPOINT + KEY_HEADER;
   return await getData(GOOGLE_BOOKS_URL, endpoint);
 };
-const dataCategory = [
-  { label: "Chính trị – pháp luật", value: 7 },
-  { label: "Khoa học công nghệ – Kinh tế", value: 1 },
-  { label: "Văn học nghệ thuật", value: 2 },
 
-  { label: "Văn hóa xã hội – Lịch sử", value: 3 },
-  { label: "Giáo trình", value: 4 },
-
-  { label: "Truyện, tiểu thuyết", value: 5 },
-  { label: "Tâm lý, tâm linh, tôn giáo", value: 6 },
-
-  { label: "Sách thiếu nhi", value: 6 },
-];
 const { width } = Dimensions.get("window");
 const HomeScreen = () => {
   const inset = useSafeAreaInsets();
