@@ -82,6 +82,7 @@ const BookDetail = ({ route }) => {
 
   const [review, setReview] = useState("");
   const [rating, setRating] = useState(0);
+  const [aveRating, setAveRating] = useState(0);
 
   let [fontsLoaded] = useFonts({
     Roboto_100Thin,
@@ -105,11 +106,20 @@ const BookDetail = ({ route }) => {
   });
   // console.log({ bookAll });
   useEffect(() => {
+    var sum = 0;
+    for (var i = 0; i < reviewLists.length; i++) {
+      sum += parseInt(reviewLists[i]?.rating, 10); //don't forget to add the base
+    }
+    const avg = sum / reviewLists.length || 0;
+    setAveRating(avg);
+  }, [reviewLists]);
+  useEffect(() => {
     // console.log(
     //   "huy",
     //   bookAll,
     //   bookAll?.filter((v) => v.id === bookDetail?.id)[0]?.length > 0
     // );
+
     try {
       const dataBook = bookAll?.filter((v) => v.id === bookDetail?.id)[0];
       if (bookAll?.filter((v) => v.id === bookDetail?.id)[0]) {
@@ -260,7 +270,7 @@ const BookDetail = ({ route }) => {
                   />
                   <Text style={styles.ratingNumber}>
                     {infoBook?.volumeInfo?.averageRating || 0} (
-                    {ratingCounts || 0} ratings)
+                    {ratingCounts || 0} ratings) ({aveRating || 0} ratings)
                   </Text>
                 </View>
                 <TouchableOpacity
